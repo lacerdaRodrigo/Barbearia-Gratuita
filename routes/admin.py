@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import mongo
 from models.admin import AdminBarbearia
-from pymongo.errors import DuplicateKeyError
+from pymongo.errors import DuplicateKeyError, ServerSelectionTimeoutError, AutoReconnect
 
 blueprint_admin = Blueprint('admin', __name__)
 
@@ -47,6 +47,9 @@ def criar_admin():
 
     except DuplicateKeyError:
         return jsonify({"mensagem": "Email já cadastrado para outro administrador."}), 409
+    except (ServerSelectionTimeoutError, AutoReconnect) as conn_err:
+        print(f"Erro de conexão com o Mongo ao criar admin: {conn_err}")
+        return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
     except Exception as erro:
         print(f"Erro ao criar admin: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
@@ -80,6 +83,8 @@ def login_admin():
 
     except Exception as erro:
         print(f"Erro no login do admin: {erro}")
+        if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
+            return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
 
@@ -110,4 +115,6 @@ def listar_usuarios():
 
     except Exception as erro:
         print(f"Erro ao listar usuários: {erro}")
+        if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
+            return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
         return jsonify({"mensagem": "Erro interno do servidor."}), 500

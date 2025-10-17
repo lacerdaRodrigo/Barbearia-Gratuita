@@ -1,25 +1,29 @@
-# Barbearia-Gratuita# 🪒 Sistema de Barbearia
+# 🪒 Sistema de Barbearia
 
-Sistema web para gerenciamento de barbearia com funcionalidades de cadastro, login e agendamento de horários.
+Sistema web para gerenciamento de barbearia com funcionalidades de cadastro, login, agendamento de horários e painel administrativo.
 
 ## 📋 Pré-requisitos
 
-Antes de executar o projeto, certifique-se de ter os seguintes softwares instalados em seu computador:
+Antes de executar o projeto, certifique-se de ter os seguintes softwares instalados:
 
 ### 1. Python 3.7 ou superior
 
 - **Download:** [https://www.python.org/downloads/](https://www.python.org/downloads/)
 - **Versão recomendada:** Python 3.9 ou superior
-- **Como verificar se já está instalado:**
+- **Como verificar:**
   ```bash
   python --version
   ```
-  ou
+
+### 2. MongoDB 6.0 ou superior
+
+- **Download:** [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
+- **Docker (alternativa):**
   ```bash
-  python3 --version
+  docker run -d -p 27017:27017 --name mongo mongo:6.0
   ```
 
-### 2. pip (Gerenciador de pacotes do Python)
+### 3. pip (Gerenciador de pacotes do Python)
 
 - Geralmente já vem instalado com o Python
 - **Como verificar:**
@@ -27,7 +31,7 @@ Antes de executar o projeto, certifique-se de ter os seguintes softwares instala
   pip --version
   ```
 
-### 3. Git (Opcional, para clonar o repositório)
+### 4. Git (Opcional, para clonar o repositório)
 
 - **Download:** [https://git-scm.com/downloads](https://git-scm.com/downloads)
 
@@ -36,67 +40,78 @@ Antes de executar o projeto, certifique-se de ter os seguintes softwares instala
 ### 1. Clone ou baixe o projeto
 
 ```bash
-git clone https://github.com/seu-usuario/barbearia.git
-cd barbearia
+git clone https://github.com/lacerdaRodrigo/Barbearia-Gratuita.git
+cd Barbearia-Gratuita
 ```
 
-Ou baixe o arquivo ZIP e extraia em uma pasta de sua preferência.
-
 ### 2. Instale as dependências Python
-
-**Opção 1 (Recomendada) - Usando requirements.txt:**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**Opção 2 - Instalação manual:**
-
-```bash
-pip install Flask Flask-SQLAlchemy Flask-CORS Werkzeug
-```
-
-**Dependências necessárias:**
+**Principais dependências:**
 
 - **Flask** - Framework web para Python
-- **Flask-SQLAlchemy** - ORM para banco de dados
 - **Flask-CORS** - Para permitir requisições do frontend
-- **Werkzeug** - Para hash de senhas (já vem com Flask)
+- **PyMongo** - Driver MongoDB para Python
+- **Flask-PyMongo** - Integração MongoDB com Flask
+- **Werkzeug** - Para hash de senhas
+- **Gunicorn** - Servidor WSGI para produção
 
-### 3. Verifique a estrutura do projeto
-
-Certifique-se de que a estrutura está assim:
+### 3. Estrutura do projeto
 
 ```
-barbearia/
+Barbearia-Gratuita/
 │
 ├── app.py                 # Arquivo principal da aplicação
-├── extensions.py          # Configurações do banco de dados
+├── extensions.py         # Configurações do MongoDB
 ├── requirements.txt      # Dependências do projeto
-├── index.html            # Interface do usuário
-├── script.js             # JavaScript do frontend
-├── styles.css            # Estilos CSS
-├── models/
-│   ├── user.py           # Modelo de usuário
-│   └── agendamento.py    # Modelo de agendamento
-└── routes/
-    ├── cadastro.py       # Rotas de cadastro
-    └── login.py          # Rotas de login
+├── index.html           # Interface do usuário
+├── script.js            # JavaScript do frontend
+├── styles.css           # Estilos CSS
+├── Procfile             # Configuração para deploy
+│
+├── models/              # Modelos de dados
+│   ├── admin.py         # Modelo de administrador
+│   ├── agendamento.py   # Modelo de agendamento
+│   ├── servico.py      # Modelo de serviço
+│   └── user.py         # Modelo de usuário
+│
+└── routes/              # Rotas da API
+    ├── admin.py         # Rotas administrativas
+    ├── agendamento.py  # Rotas de agendamento
+    ├── cadastro.py     # Rotas de cadastro
+    ├── login.py        # Rotas de autenticação
+    └── servico.py      # Rotas de serviços
 ```
 
 ## ▶️ Como executar o projeto
 
-### 1. Execute a aplicação
+### 1. Inicie o MongoDB
 
-No terminal, dentro da pasta do projeto, execute:
+Se estiver usando MongoDB local:
+
+```bash
+# Verifique se o serviço está rodando
+mongod
+```
+
+Se estiver usando Docker:
+
+```bash
+docker run -d -p 27017:27017 --name mongo mongo:6.0
+```
+
+### 2. Execute a aplicação
+
+No terminal, dentro da pasta do projeto:
 
 ```bash
 python app.py
 ```
 
-### 2. Acesse no navegador
-
-Abra seu navegador e acesse:
+### 3. Acesse no navegador
 
 ```
 http://localhost:5000
@@ -106,91 +121,124 @@ http://localhost:5000
 
 - ✅ **Cadastro de usuários** - Registro com nome, email, telefone e senha
 - ✅ **Login seguro** - Autenticação com hash de senha
+- ✅ **Painel administrativo** - Gerenciamento de serviços e horários
+- ✅ **Sistema de agendamentos** - Marcação de horários pelos clientes
+- ✅ **Gestão de serviços** - Cadastro e edição de serviços oferecidos
 - ✅ **Interface responsiva** - Design moderno e funcional
-- ✅ **Banco de dados SQLite** - Armazenamento local automático
+- ✅ **Banco MongoDB** - Armazenamento escalável e flexível
 - ✅ **Validações** - Verificação de dados de entrada
-- 🚧 **Sistema de agendamentos** - Em desenvolvimento
 
-## 💾 Banco de Dados
+## � Como usar
 
-O projeto utiliza **SQLite** que é criado automaticamente na primeira execução. O arquivo `barbearia.db` será gerado na pasta do projeto.
+### Usuários comuns:
 
-## 🌐 Navegadores Suportados
+1. **Cadastro:**
 
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-
-## 📱 Como usar
-
-1. **Primeiro acesso:**
-
-   - Clique na aba "Cadastro"
-   - Preencha seus dados (nome, email, telefone, senha)
+   - Acesse a aba "Cadastro"
+   - Preencha seus dados
    - Clique em "Cadastrar"
 
 2. **Login:**
 
-   - Use seu email e senha cadastrados
+   - Use seu email e senha
    - Clique em "Entrar"
 
-3. **Dashboard:**
-   - Após o login, você verá a área do usuário
-   - Funcionalidades de agendamento estarão disponíveis em breve
+3. **Agendamentos:**
+   - Escolha o serviço desejado
+   - Selecione data e horário
+   - Confirme o agendamento
+
+### Administradores:
+
+1. **Acesso administrativo:**
+
+   - Acesse a aba "Admin"
+   - Faça login com credenciais de administrador
+
+2. **Gerenciamento:**
+   - Cadastre novos serviços
+   - Gerencie horários disponíveis
+   - Visualize agendamentos
+   - Cadastre outros administradores
+
+## 🌐 API Endpoints
+
+### Autenticação
+
+- `POST /login` - Login de usuário
+- `POST /admin/login` - Login de administrador
+
+### Usuários
+
+- `POST /cadastro` - Criar novo usuário
+- `GET /user/<id>` - Buscar usuário por ID
+
+### Administração
+
+- `POST /admin` - Criar novo administrador
+- `GET /admin/<id>` - Buscar administrador por ID
+
+### Serviços
+
+- `GET /servicos` - Listar todos os serviços
+- `POST /servicos` - Criar novo serviço
+- `PUT /servicos/<id>` - Atualizar serviço
+- `DELETE /servicos/<id>` - Remover serviço
+
+### Agendamentos
+
+- `GET /agendamentos` - Listar agendamentos
+- `POST /agendamentos` - Criar agendamento
+- `DELETE /agendamentos/<id>` - Cancelar agendamento
 
 ## 🔧 Solução de Problemas
 
-### Erro: "ModuleNotFoundError"
+### Erro de conexão com MongoDB
 
-- Certifique-se de que instalou todas as dependências:
-  ```bash
-  pip install Flask Flask-SQLAlchemy Flask-CORS
-  ```
+- Verifique se o MongoDB está rodando
+- Confirme a porta 27017 está livre
+- Verifique as credenciais de acesso
 
-### Erro: "Port already in use"
+### Erros de CORS
 
-- Outra aplicação está usando a porta 5000
-- Pare outros processos ou mude a porta no arquivo `app.py`
+- O Flask-CORS está configurado
+- Verifique se está acessando pela URL correta
 
 ### Página não carrega
 
-- Verifique se o Python está executando sem erros
-- Confirme que está acessando `http://localhost:5000`
-- Verifique o terminal para mensagens de erro
-
-### Problemas de CORS
-
-- O Flask-CORS já está configurado
-- Se persistir, verifique se está acessando pela URL correta
+- Verifique os logs no terminal
+- Confirme que o MongoDB está acessível
+- Certifique-se que está na URL correta
 
 ## 📝 Desenvolvimento
 
-### Estrutura do Código
+### Stack Tecnológica
 
-- **Backend:** Flask (Python)
+- **Backend:**
 
-  - Rotas organizadas em Blueprints
-  - SQLAlchemy para ORM
-  - Werkzeug para segurança
+  - Flask (Python)
+  - MongoDB
+  - PyMongo
+  - Werkzeug
 
-- **Frontend:** HTML, CSS, JavaScript vanilla
-  - Interface responsiva
-  - Validações do lado cliente
-  - Comunicação via Fetch API
+- **Frontend:**
+  - HTML5
+  - CSS3
+  - JavaScript vanilla
+  - Fetch API
 
 ### Adicionando Novas Funcionalidades
 
-1. Modelos: Adicione em `models/`
-2. Rotas: Crie em `routes/`
-3. Frontend: Modifique `index.html`, `script.js`, `styles.css`
+1. **Modelos:** Adicione em `models/`
+2. **Rotas:** Crie em `routes/`
+3. **Frontend:** Modifique `index.html`, `script.js`, `styles.css`
 
 ## 🤝 Contribuição
 
 1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
 ## 📄 Licença
@@ -203,7 +251,10 @@ Em caso de dúvidas ou problemas:
 
 - Abra uma issue no GitHub
 - Verifique os logs no terminal
-- Consulte a documentação do Flask: [https://flask.palletsprojects.com/](https://flask.palletsprojects.com/)
+- Consulte a documentação:
+  - [Flask](https://flask.palletsprojects.com/)
+  - [PyMongo](https://pymongo.readthedocs.io/)
+  - [MongoDB](https://docs.mongodb.com/)
 
 ---
 

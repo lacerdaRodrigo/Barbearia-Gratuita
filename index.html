@@ -100,6 +100,38 @@
             </button>
             <div class="admin-credentials"></div>
           </form>
+
+          <!-- Formulário de Cadastro de Admin (colocado aqui para acesso inicial) -->
+          <div class="admin-register">
+            <hr />
+            <h4>👑 Criar Novo Admin</h4>
+            <form id="criar-admin-form">
+              <div class="input-group">
+                <label for="novo-admin-nome">Nome</label>
+                <input type="text" id="novo-admin-nome" name="nome" required />
+              </div>
+              <div class="input-group">
+                <label for="novo-admin-email">Email</label>
+                <input
+                  type="email"
+                  id="novo-admin-email"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="input-group">
+                <label for="novo-admin-senha">Senha</label>
+                <input
+                  type="password"
+                  id="novo-admin-senha"
+                  name="senha"
+                  required
+                  minlength="6"
+                />
+              </div>
+              <button type="submit" class="btn btn-admin">Criar Admin</button>
+            </form>
+          </div>
         </div>
 
         <!-- Área de mensagens -->
@@ -461,40 +493,7 @@
               </div>
             </div>
 
-            <div class="config-card">
-              <h4>👑 Criar Novo Admin</h4>
-              <form id="criar-admin-form">
-                <div class="input-group">
-                  <label for="novo-admin-nome">Nome</label>
-                  <input
-                    type="text"
-                    id="novo-admin-nome"
-                    name="nome"
-                    required
-                  />
-                </div>
-                <div class="input-group">
-                  <label for="novo-admin-email">Email</label>
-                  <input
-                    type="email"
-                    id="novo-admin-email"
-                    name="email"
-                    required
-                  />
-                </div>
-                <div class="input-group">
-                  <label for="novo-admin-senha">Senha</label>
-                  <input
-                    type="password"
-                    id="novo-admin-senha"
-                    name="senha"
-                    required
-                    minlength="6"
-                  />
-                </div>
-                <button type="submit" class="btn btn-admin">Criar Admin</button>
-              </form>
-            </div>
+            <!-- Removido formulário duplicado de criação de admin (manter apenas o formulário na aba Admin) -->
           </div>
         </div>
 
