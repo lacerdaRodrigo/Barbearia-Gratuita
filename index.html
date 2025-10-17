@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barbearia - Sistema de Agendamento</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="form-container">
+        <div class="form-header">
+          <h1>🪒 Barbearia</h1>
+          <p>Faça login ou cadastre-se para agendar seu horário</p>
+        </div>
+
+        <!-- Abas de navegação -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="login">👤 Cliente</button>
+          <button class="tab-btn" data-tab="cadastro">📝 Cadastro</button>
+          <button class="tab-btn" data-tab="admin">👑 Admin</button>
+        </div>
+
+        <!-- Formulário de Login -->
+        <div id="login-form" class="form-content active">
+          <form id="loginForm">
+            <div class="input-group">
+              <label for="login-email">📧 Email</label>
+              <input type="email" id="login-email" name="email" required />
+            </div>
+            <div class="input-group">
+              <label for="login-senha">🔒 Senha</label>
+              <input type="password" id="login-senha" name="senha" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Entrar</button>
+          </form>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div id="cadastro-form" class="form-content">
+          <form id="cadastroForm">
+            <div class="input-group">
+              <label for="cadastro-nome">👤 Nome</label>
+              <input type="text" id="cadastro-nome" name="nome" required />
+            </div>
+            <div class="input-group">
+              <label for="cadastro-email">📧 Email</label>
+              <input type="email" id="cadastro-email" name="email" required />
+            </div>
+            <div class="input-group">
+              <label for="cadastro-telefone">📞 Telefone</label>
+              <input
+                type="tel"
+                id="cadastro-telefone"
+                name="telefone"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <label for="cadastro-senha">🔒 Senha</label>
+              <input
+                type="password"
+                id="cadastro-senha"
+                name="senha"
+                required
+                minlength="6"
+              />
+            </div>
+            <div class="input-group">
+              <label for="confirm-senha">🔒 Confirmar Senha</label>
+              <input
+                type="password"
+                id="confirm-senha"
+                name="confirmSenha"
+                required
+                minlength="6"
+              />
+            </div>
+            <button type="submit" class="btn btn-secondary">Cadastrar</button>
+          </form>
+        </div>
+
+        <!-- Formulário de Login Admin -->
+        <div id="admin-form" class="form-content">
+          <form id="adminForm">
+            <div class="admin-header">
+              <h3>👑 Acesso Administrativo</h3>
+              <p>Área restrita para administradores da barbearia</p>
+            </div>
+            <div class="input-group">
+              <label for="admin-email">📧 Email do Admin</label>
+              <input type="email" id="admin-email" name="email" required />
+            </div>
+            <div class="input-group">
+              <label for="admin-senha">🔒 Senha do Admin</label>
+              <input type="password" id="admin-senha" name="senha" required />
+            </div>
+            <button type="submit" class="btn btn-admin">
+              👑 Entrar como Admin
+            </button>
+            <div class="admin-credentials">
+              <small>🔑 Admin padrão: admin@barbearia.com / admin123</small>
+            </div>
+          </form>
+        </div>
+
+        <!-- Área de mensagens -->
+        <div id="message" class="message"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard de Agendamentos (aparece após login bem-sucedido) -->
+    <div id="dashboard" class="dashboard hidden">
+      <div class="dashboard-header">
+        <div class="header-info">
+          <h2>🎉 Bem-vindo, <span id="user-name">Usuário</span>!</h2>
+          <small id="sessao-info-usuario" class="sessao-info"
+            >🕐 Sessão ativa</small
+          >
+        </div>
+        <div class="header-actions">
+          <button
+            id="estender-sessao-usuario"
+            class="btn btn-small btn-extend"
+            title="Estender sessão por mais 24h"
+          >
+            🔄
+          </button>
+          <button id="logout-btn" class="btn btn-logout">Sair</button>
+        </div>
+      </div>
+
+      <div class="dashboard-content">
+        <!-- Navegação do Dashboard -->
+        <div class="dashboard-tabs">
+          <button
+            class="dashboard-tab-btn active"
+            data-dashboard-tab="novo-agendamento"
+          >
+            📅 Novo Agendamento
+          </button>
+          <button
+            class="dashboard-tab-btn"
+            data-dashboard-tab="meus-agendamentos"
+          >
+            📋 Meus Agendamentos
+          </button>
+        </div>
+
+        <!-- Formulário de Novo Agendamento -->
+        <div id="novo-agendamento" class="dashboard-tab-content active">
+          <div class="agendamento-card">
+            <h3>📅 Agendar Horário</h3>
+            <form id="agendamentoForm">
+              <div class="input-group">
+                <label for="cliente-nome">👤 Seu Nome</label>
+                <input
+                  type="text"
+                  id="cliente-nome"
+                  name="nome_do_cliente"
+                  required
+                  readonly
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="tipo-servico">💇‍♂️ Tipo de Serviço</label>
+                <select id="tipo-servico" name="tipo_de_servico" required>
+                  <option value="">Escolha um serviço...</option>
+                  <option value="Corte Masculino">
+                    💇‍♂️ Corte Masculino - R$ 25,00
+                  </option>
+                  <option value="Corte Feminino">
+                    💇‍♀️ Corte Feminino - R$ 35,00
+                  </option>
+                  <option value="Barba">🧔 Barba - R$ 20,00</option>
+                  <option value="Corte + Barba">
+                    ✨ Corte + Barba - R$ 40,00
+                  </option>
+                  <option value="Bigode">👨‍🦱 Bigode - R$ 15,00</option>
+                  <option value="Escova">🌪️ Escova - R$ 30,00</option>
+                  <option value="Hidratação">💧 Hidratação - R$ 45,00</option>
+                  <option value="Corte + Barba + Bigode">
+                    🔥 Pacote Completo - R$ 50,00
+                  </option>
+                </select>
+              </div>
+
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="data-agendamento">📅 Data</label>
+                  <input
+                    type="date"
+                    id="data-agendamento"
+                    name="data"
+                    required
+                  />
+                </div>
+
+                <div class="input-group">
+                  <label for="hora-agendamento">⏰ Horário</label>
+                  <select id="hora-agendamento" name="hora" required>
+                    <option value="">Escolha um horário...</option>
+                    <option value="08:00">08:00</option>
+                    <option value="08:30">08:30</option>
+                    <option value="09:00">09:00</option>
+                    <option value="09:30">09:30</option>
+                    <option value="10:00">10:00</option>
+                    <option value="10:30">10:30</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                    <option value="15:00">15:00</option>
+                    <option value="15:30">15:30</option>
+                    <option value="16:00">16:00</option>
+                    <option value="16:30">16:30</option>
+                    <option value="17:00">17:00</option>
+                    <option value="17:30">17:30</option>
+                    <option value="18:00">18:00</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-large">
+                ✅ Confirmar Agendamento
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Lista de Agendamentos -->
+        <div id="meus-agendamentos" class="dashboard-tab-content">
+          <div class="agendamentos-header">
+            <h3>📋 Seus Agendamentos</h3>
+            <button id="refresh-agendamentos" class="btn btn-small">
+              🔄 Atualizar
+            </button>
+          </div>
+
+          <div id="agendamentos-lista" class="agendamentos-lista">
+            <div class="loading">Carregando agendamentos...</div>
+          </div>
+        </div>
+
+        <!-- Área de mensagens do dashboard -->
+        <div id="dashboard-message" class="message"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard do Admin (aparece após login de admin bem-sucedido) -->
+    <div id="admin-dashboard" class="dashboard admin-dashboard hidden">
+      <div class="dashboard-header">
+        <div class="header-info">
+          <h2>👑 Painel Administrativo - <span id="admin-name">Admin</span></h2>
+          <small id="sessao-info-admin" class="sessao-info"
+            >🕐 Sessão ativa</small
+          >
+        </div>
+        <div class="header-actions">
+          <button
+            id="estender-sessao-admin"
+            class="btn btn-small btn-extend"
+            title="Estender sessão por mais 24h"
+          >
+            🔄
+          </button>
+          <button id="admin-logout-btn" class="btn btn-logout">Sair</button>
+        </div>
+      </div>
+
+      <div class="dashboard-content">
+        <!-- Navegação do Dashboard Admin -->
+        <div class="dashboard-tabs">
+          <button
+            class="dashboard-tab-btn active"
+            data-dashboard-tab="admin-estatisticas"
+          >
+            📊 Estatísticas
+          </button>
+          <button
+            class="dashboard-tab-btn"
+            data-dashboard-tab="admin-agendamentos"
+          >
+            📅 Agendamentos
+          </button>
+          <button class="dashboard-tab-btn" data-dashboard-tab="admin-usuarios">
+            👥 Usuários
+          </button>
+          <button class="dashboard-tab-btn" data-dashboard-tab="admin-precos">
+            💰 Preços
+          </button>
+          <button class="dashboard-tab-btn" data-dashboard-tab="admin-config">
+            ⚙️ Configurações
+          </button>
+        </div>
+
+        <!-- Estatísticas -->
+        <div id="admin-estatisticas" class="dashboard-tab-content active">
+          <div class="admin-cards">
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-content">
+                <h3 id="total-usuarios">-</h3>
+                <p>Usuários Cadastrados</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📅</div>
+              <div class="stat-content">
+                <h3 id="total-agendamentos">-</h3>
+                <p>Agendamentos Totais</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-content">
+                <h3 id="agendamentos-hoje">-</h3>
+                <p>Agendamentos Hoje</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-content">
+                <h3 id="receita-estimada">R$ -</h3>
+                <p>Receita Estimada</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-section">
+            <h3>📊 Serviços Mais Populares</h3>
+            <div id="servicos-chart" class="chart-container">
+              <div class="loading">Carregando estatísticas...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gerenciar Agendamentos -->
+        <div id="admin-agendamentos" class="dashboard-tab-content">
+          <div class="admin-section-header">
+            <h3>📅 Gerenciar Agendamentos</h3>
+            <button id="refresh-admin-agendamentos" class="btn btn-small">
+              🔄 Atualizar
+            </button>
+          </div>
+
+          <div id="admin-agendamentos-lista" class="admin-lista">
+            <div class="loading">Carregando agendamentos...</div>
+          </div>
+        </div>
+
+        <!-- Gerenciar Usuários -->
+        <div id="admin-usuarios" class="dashboard-tab-content">
+          <div class="admin-section-header">
+            <h3>👥 Gerenciar Usuários</h3>
+            <button id="refresh-usuarios" class="btn btn-small">
+              🔄 Atualizar
+            </button>
+          </div>
+
+          <div id="admin-usuarios-lista" class="admin-lista">
+            <div class="loading">Carregando usuários...</div>
+          </div>
+        </div>
+
+        <!-- Gerenciar Preços -->
+        <div id="admin-precos" class="dashboard-tab-content">
+          <div class="admin-section-header">
+            <h3>💰 Gerenciar Preços dos Serviços</h3>
+            <button id="refresh-precos" class="btn btn-small">
+              🔄 Atualizar
+            </button>
+          </div>
+
+          <!-- Formulário para adicionar novo serviço -->
+          <div class="config-card">
+            <h4>➕ Adicionar Novo Serviço</h4>
+            <form id="novo-servico-form">
+              <div class="input-row">
+                <div class="input-group">
+                  <label for="novo-servico-nome">Nome do Serviço</label>
+                  <input
+                    type="text"
+                    id="novo-servico-nome"
+                    name="nome"
+                    required
+                    placeholder="Ex: Corte Social"
+                  />
+                </div>
+                <div class="input-group">
+                  <label for="novo-servico-preco">Preço (R$)</label>
+                  <input
+                    type="number"
+                    id="novo-servico-preco"
+                    name="preco"
+                    required
+                    step="0.01"
+                    min="0.01"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+              <div class="input-group">
+                <label for="novo-servico-emoji">Emoji</label>
+                <input
+                  type="text"
+                  id="novo-servico-emoji"
+                  name="emoji"
+                  placeholder="💇‍♂️"
+                  maxlength="10"
+                />
+              </div>
+              <button type="submit" class="btn btn-admin">
+                ➕ Adicionar Serviço
+              </button>
+            </form>
+          </div>
+
+          <!-- Lista de serviços existentes -->
+          <div class="config-card">
+            <h4>📋 Serviços Existentes</h4>
+            <div id="servicos-lista" class="admin-lista">
+              <div class="loading">Carregando serviços...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configurações -->
+        <div id="admin-config" class="dashboard-tab-content">
+          <div class="config-section">
+            <h3>⚙️ Configurações da Barbearia</h3>
+
+            <div class="config-card">
+              <h4>🔧 Horários de Funcionamento</h4>
+              <p>Segunda a Sexta: 08:00 - 18:00</p>
+              <p>Sábado: 08:00 - 16:00</p>
+              <p>Domingo: Fechado</p>
+            </div>
+
+            <div class="config-card">
+              <h4>💰 Preços dos Serviços</h4>
+              <div class="price-list">
+                <div class="price-item">
+                  <span>💇‍♂️ Corte Masculino</span>
+                  <span>R$ 25,00</span>
+                </div>
+                <div class="price-item">
+                  <span>💇‍♀️ Corte Feminino</span>
+                  <span>R$ 35,00</span>
+                </div>
+                <div class="price-item">
+                  <span>🧔 Barba</span>
+                  <span>R$ 20,00</span>
+                </div>
+                <div class="price-item">
+                  <span>✨ Corte + Barba</span>
+                  <span>R$ 40,00</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="config-card">
+              <h4>👑 Criar Novo Admin</h4>
+              <form id="criar-admin-form">
+                <div class="input-group">
+                  <label for="novo-admin-nome">Nome</label>
+                  <input
+                    type="text"
+                    id="novo-admin-nome"
+                    name="nome"
+                    required
+                  />
+                </div>
+                <div class="input-group">
+                  <label for="novo-admin-email">Email</label>
+                  <input
+                    type="email"
+                    id="novo-admin-email"
+                    name="email"
+                    required
+                  />
+                </div>
+                <div class="input-group">
+                  <label for="novo-admin-senha">Senha</label>
+                  <input
+                    type="password"
+                    id="novo-admin-senha"
+                    name="senha"
+                    required
+                    minlength="6"
+                  />
+                </div>
+                <button type="submit" class="btn btn-admin">Criar Admin</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área de mensagens do dashboard admin -->
+        <div id="admin-dashboard-message" class="message"></div>
+      </div>
+    </div>
+
+    <!-- Modal para editar serviço -->
+    <div id="edit-servico-modal" class="edit-modal">
+      <div class="edit-modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>✏️ Editar Serviço</h3>
+        <form id="edit-servico-form">
+          <input type="hidden" id="edit-servico-id" />
+          <div class="input-group">
+            <label for="edit-servico-nome">Nome do Serviço</label>
+            <input type="text" id="edit-servico-nome" name="nome" required />
+          </div>
+          <div class="input-group">
+            <label for="edit-servico-preco">Preço (R$)</label>
+            <input
+              type="number"
+              id="edit-servico-preco"
+              name="preco"
+              required
+              step="0.01"
+              min="0.01"
+            />
+          </div>
+          <div class="input-group">
+            <label for="edit-servico-emoji">Emoji</label>
+            <input
+              type="text"
+              id="edit-servico-emoji"
+              name="emoji"
+              maxlength="10"
+            />
+          </div>
+          <div style="text-align: center">
+            <button type="button" class="btn btn-secondary close-modal-btn">
+              ❌ Cancelar
+            </button>
+            <button type="submit" class="btn btn-admin">💾 Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

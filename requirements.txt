@@ -1,0 +1,8 @@
+Flask==3.0.3
+Flask-CORS==4.0.1
+Werkzeug==3.0.3
+pymongo==4.15.3
+flask-pymongo==3.0.1
+dnspython==2.7.0
+certifi==2024.2.2
+gunicorn==21.2.0
