@@ -264,6 +264,70 @@ function configurar_formularios() {
   formulario_de_login.addEventListener("submit", processar_login);
   formulario_de_cadastro.addEventListener("submit", processar_cadastro);
   formulario_admin.addEventListener("submit", processar_login_admin);
+  // Formulário criar admin (na seção de configurações do admin)
+  const criarAdminForm = document.getElementById("criar-admin-form");
+  if (criarAdminForm) {
+    criarAdminForm.addEventListener("submit", async (evt) => {
+      evt.preventDefault();
+
+      const nome = document.getElementById("novo-admin-nome").value.trim();
+      const email = document.getElementById("novo-admin-email").value.trim();
+      const senha = document.getElementById("novo-admin-senha").value;
+
+      const adminMsgEl = document.getElementById("admin-dashboard-message");
+
+      function showAdminMsg(text, type = "info") {
+        if (!adminMsgEl) return;
+        adminMsgEl.textContent = text;
+        adminMsgEl.className = `message ${type}`;
+      }
+
+      if (!nome || !email || !senha || senha.length < 6) {
+        showAdminMsg(
+          "Preencha todos os campos corretamente. Senha mínimo 6 caracteres.",
+          "error"
+        );
+        return;
+      }
+
+      const submitBtn = criarAdminForm.querySelector('button[type="submit"]');
+      const prevText = submitBtn ? submitBtn.textContent : "Criar Admin";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Enviando...";
+      }
+
+      try {
+        const res = await fetch(`${URL_BASE_DA_API}/admin`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, email, senha }),
+        });
+
+        const payload = await res.json().catch(() => ({}));
+
+        if (res.status === 201) {
+          showAdminMsg(
+            payload.mensagem || "Administrador criado com sucesso!",
+            "success"
+          );
+          criarAdminForm.reset();
+        } else if (res.status === 409) {
+          showAdminMsg(payload.mensagem || "Email já cadastrado.", "error");
+        } else {
+          showAdminMsg(payload.mensagem || `Erro: ${res.status}`, "error");
+        }
+      } catch (err) {
+        console.error("Erro ao criar admin:", err);
+        showAdminMsg("Erro de rede ao criar admin. Tente novamente.", "error");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = prevText;
+        }
+      }
+    });
+  }
 }
 
 // Configuração do logout
