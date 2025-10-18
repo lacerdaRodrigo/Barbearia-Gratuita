@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash
 from extensions import mongo
 from models.user import Usuario
 from pymongo.errors import DuplicateKeyError
+from bson.objectid import ObjectId
 
 blueprint_cadastro = Blueprint('cadastro', __name__)
 
@@ -97,3 +98,37 @@ def lista_usuarios():
     except Exception as erro:
         print(f"Erro ao listar usuários: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor, ao listar usuarios cadastrados"}), 500
+
+@blueprint_cadastro.route('/cadastro/<id_usuario>', methods=['DELETE'])
+def deletar_usuario(id_usuario):
+    try:
+        id_objeto = ObjectId(id_usuario)
+
+        usuarios_collection = mongo.db.usuarios
+
+        resultado = usuarios_collection.delete_one({"_id": id_objeto})
+
+        if resultado.deleted_count == 0:
+            return jsonify({"mensagem": "Usuário não encontrado."}), 404
+        
+        return jsonify({"mensagem": "Usuário deletado com sucesso."}), 200
+    
+    except Exception as erro:
+        if "Invalid ObjectId" in str(erro):
+             return jsonify({"mensagem": "ID de usuário inválido."}), 400
+             
+        print(f"Erro ao deletar usuário: {erro}")
+        return jsonify({"mensagem": "Erro interno do servidor ao deletar usuário."}), 500
+    
+@blueprint_cadastro.route('/cadastro/deletar_todos', methods=['DELETE'])
+def deletar_todos_usuarios():
+    try:
+        usuarios_collection = mongo.db.usuarios
+
+        resultado = usuarios_collection.delete_many({})
+
+        return jsonify({"mensagem": f"Todos os usuários deletados com sucesso. Total deletado: {resultado.deleted_count}"}), 200
+    
+    except Exception as erro:
+        print(f"Erro ao deletar todos os usuários: {erro}")
+        return jsonify({"mensagem": "Erro interno do servidor ao deletar todos os usuários."}), 500 
