@@ -33,9 +33,12 @@ def cadastro():
         telefone_usuario = dados_recebidos.get('telefone')
         senha_usuario = dados_recebidos.get('senha')
 
-        
+        #validações dos campos
         if not nome_usuario:
             return jsonify({"mensagem": "Nome de usuário é obrigatório."}), 400
+        
+        if not senha_usuario:
+            return jsonify({"mensagem": "Senha é obrigatória."}), 400
         
         if not email_usuario and not telefone_usuario:
             return jsonify({"mensagem": "Email e telefone são obrigatórios para dar sequência"}), 400
@@ -48,7 +51,6 @@ def cadastro():
 
         if not telefone_usuario:
             return jsonify({"mensagem": "Telefone é obrigatório."}), 400
-        
         
         telefone_limpo = ''.join(filter(str.isdigit, telefone_usuario))
         
@@ -137,10 +139,9 @@ def deletar_usuario(id_usuario):
 def deletar_todos_usuarios():
     try:
         usuarios_collection = mongo.db.usuarios
+        usuarios_collection.delete_many({})
 
-        resultado = usuarios_collection.delete_many({})
-
-        return jsonify({"mensagem": f"Todos os usuários deletados com sucesso. Total deletado: {resultado.deleted_count}"}), 200
+        return jsonify({"mensagem": f"Todos os usuários deletados com sucesso"}), 200
     
     except Exception as erro:
         print(f"Erro ao deletar todos os usuários: {erro}")
