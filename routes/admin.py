@@ -120,7 +120,7 @@ def listar_usuarios():
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
 @blueprint_admin.route('/admin/usuarios/delete', methods=['DELETE'])
-def delete_admin:
+def delete_admin():
     try:
         admins_collection = mongo.db.admins
 
