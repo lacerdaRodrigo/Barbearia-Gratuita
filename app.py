@@ -1,6 +1,7 @@
 # ...existing code...
 import os
 import certifi
+import jwt
 from datetime import datetime
 from flask import Flask
 from flask_cors import CORS
