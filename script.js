@@ -568,21 +568,9 @@ function configurar_formulario_admin() {
   }
 
   if (senhaInput) {
-    senhaInput.placeholder = "Mínimo 8 caracteres (recomenda-se senha forte)";
+    senhaInput.placeholder = "Digite sua senha";
     senhaInput.setAttribute("maxlength", "128");
-    senhaInput.setAttribute("minlength", "8");
-  }
-
-  // Indicador de força da senha em tempo real
-  if (senhaInput) {
-    senhaInput.addEventListener("input", (evento) => {
-      const senha = evento.target.value;
-      const indicador =
-        document.getElementById("senha-strength") || criarIndicadorSenha();
-
-      const forca = calcularForcaSenha(senha);
-      atualizarIndicadorSenha(indicador, forca);
-    });
+    senhaInput.setAttribute("minlength", "6");
   }
 
   // Validação de email em tempo real
@@ -604,61 +592,6 @@ function configurar_formulario_admin() {
       }
     });
   }
-}
-
-// Criar indicador visual de força da senha
-function criarIndicadorSenha() {
-  const senhaInput = document.getElementById("novo-admin-senha");
-  const indicador = document.createElement("div");
-  indicador.id = "senha-strength";
-  indicador.className = "senha-strength";
-  indicador.innerHTML = `
-    <div class="strength-bar">
-      <div class="strength-fill"></div>
-    </div>
-    <div class="strength-text">Digite uma senha</div>
-  `;
-
-  senhaInput.parentNode.appendChild(indicador);
-  return indicador;
-}
-
-// Calcular força da senha
-function calcularForcaSenha(senha) {
-  let pontos = 0;
-  let nivel = "fraca";
-  let cor = "#dc3545";
-  let texto = "Senha fraca";
-
-  if (senha.length >= 8) pontos += 1;
-  if (senha.length >= 12) pontos += 1;
-  if (/[a-z]/.test(senha)) pontos += 1;
-  if (/[A-Z]/.test(senha)) pontos += 1;
-  if (/[0-9]/.test(senha)) pontos += 1;
-  if (/[^A-Za-z0-9]/.test(senha)) pontos += 1;
-
-  if (pontos >= 5) {
-    nivel = "forte";
-    cor = "#28a745";
-    texto = "Senha forte ✅";
-  } else if (pontos >= 3) {
-    nivel = "media";
-    cor = "#ffc107";
-    texto = "Senha média ⚠️";
-  }
-
-  return { pontos, nivel, cor, texto, porcentagem: (pontos / 6) * 100 };
-}
-
-// Atualizar indicador visual de força da senha
-function atualizarIndicadorSenha(indicador, forca) {
-  const fill = indicador.querySelector(".strength-fill");
-  const text = indicador.querySelector(".strength-text");
-
-  fill.style.width = `${forca.porcentagem}%`;
-  fill.style.backgroundColor = forca.cor;
-  text.textContent = forca.texto;
-  text.style.color = forca.cor;
 }
 
 // Configuração do logout
@@ -1958,29 +1891,23 @@ async function criar_novo_admin(evento) {
     senha: dados_formulario.get("senha"),
   };
 
-  // === VALIDAÇÕES DETALHADAS ===
+  // === VALIDAÇÕES BÁSICAS ===
 
   // Validação do nome
   if (!dados_admin.nome) {
-    mostrar_mensagem_admin("👤 Nome do administrador é obrigatório.", "error");
+    mostrar_mensagem_admin("Nome do administrador é obrigatório.", "error");
     document.getElementById("novo-admin-nome").focus();
     return;
   }
 
   if (dados_admin.nome.length < 2) {
-    mostrar_mensagem_admin(
-      "👤 Nome deve ter pelo menos 2 caracteres.",
-      "error"
-    );
+    mostrar_mensagem_admin("Nome deve ter pelo menos 2 caracteres.", "error");
     document.getElementById("novo-admin-nome").focus();
     return;
   }
 
   if (dados_admin.nome.length > 50) {
-    mostrar_mensagem_admin(
-      "👤 Nome deve ter no máximo 50 caracteres.",
-      "error"
-    );
+    mostrar_mensagem_admin("Nome deve ter no máximo 50 caracteres.", "error");
     document.getElementById("novo-admin-nome").focus();
     return;
   }
@@ -1989,7 +1916,7 @@ async function criar_novo_admin(evento) {
   const nomeRegex = /^[a-zA-ZàáâãäéêëíìîïóôõöúùûüçñÀÁÂÃÄÉÊËÍÌÎÏÓÔÕÖÚÙÛÜÇÑ\s]+$/;
   if (!nomeRegex.test(dados_admin.nome)) {
     mostrar_mensagem_admin(
-      "👤 Nome deve conter apenas letras e espaços.",
+      "Nome deve conter apenas letras e espaços.",
       "error"
     );
     document.getElementById("novo-admin-nome").focus();
@@ -1998,89 +1925,40 @@ async function criar_novo_admin(evento) {
 
   // Validação do email
   if (!dados_admin.email) {
-    mostrar_mensagem_admin("📧 Email do administrador é obrigatório.", "error");
+    mostrar_mensagem_admin("Email do administrador é obrigatório.", "error");
     document.getElementById("novo-admin-email").focus();
     return;
   }
 
-  // Validação de formato de email mais robusta
+  // Validação de formato de email
   const emailRegex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   if (!emailRegex.test(dados_admin.email)) {
-    mostrar_mensagem_admin(
-      "📧 Por favor, insira um email válido (exemplo: admin@barbearia.com).",
-      "error"
-    );
+    mostrar_mensagem_admin("Por favor, insira um email válido.", "error");
     document.getElementById("novo-admin-email").focus();
-    return;
-  }
-
-  // Validação se é um email empresarial (opcional, mas recomendado para admin)
-  const dominiosPublicos = [
-    "gmail.com",
-    "yahoo.com",
-    "hotmail.com",
-    "outlook.com",
-    "live.com",
-  ];
-  const dominio = dados_admin.email.split("@")[1];
-  if (dominiosPublicos.includes(dominio)) {
-    mostrar_confirmacao(
-      "⚠️ Email Público Detectado",
-      `Você está usando um email público (${dominio}). Para segurança, recomenda-se usar um email empresarial. Deseja continuar mesmo assim?`,
-      async (confirmado) => {
-        if (confirmado) {
-          await processar_cadastro_admin(formulario, dados_admin);
-        }
-      }
-    );
     return;
   }
 
   // Validação da senha
   if (!dados_admin.senha) {
-    mostrar_mensagem_admin("🔒 Senha do administrador é obrigatória.", "error");
+    mostrar_mensagem_admin("Senha do administrador é obrigatória.", "error");
     document.getElementById("novo-admin-senha").focus();
     return;
   }
 
-  if (dados_admin.senha.length < 8) {
-    mostrar_mensagem_admin(
-      "🔒 Senha deve ter pelo menos 8 caracteres para maior segurança.",
-      "error"
-    );
+  if (dados_admin.senha.length < 6) {
+    mostrar_mensagem_admin("Senha deve ter pelo menos 6 caracteres.", "error");
     document.getElementById("novo-admin-senha").focus();
     return;
   }
 
   if (dados_admin.senha.length > 128) {
-    mostrar_mensagem_admin(
-      "🔒 Senha deve ter no máximo 128 caracteres.",
-      "error"
-    );
+    mostrar_mensagem_admin("Senha deve ter no máximo 128 caracteres.", "error");
     document.getElementById("novo-admin-senha").focus();
     return;
   }
 
-  // Validação de força da senha
-  const senhaForte =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
-  if (!senhaForte.test(dados_admin.senha)) {
-    mostrar_confirmacao(
-      "🔐 Senha Fraca Detectada",
-      "Para maior segurança, recomenda-se uma senha com: letra minúscula, maiúscula, número e símbolo. Deseja continuar com esta senha?",
-      async (confirmado) => {
-        if (confirmado) {
-          await processar_cadastro_admin(formulario, dados_admin);
-        } else {
-          document.getElementById("novo-admin-senha").focus();
-        }
-      }
-    );
-    return;
-  }
-
-  // Se passou em todas as validações, processa o cadastro
+  // Processar o cadastro
   await processar_cadastro_admin(formulario, dados_admin);
 }
 
@@ -2101,35 +1979,21 @@ async function processar_cadastro_admin(formulario, dados_admin) {
     const resultado = await resposta.json();
 
     if (resposta.ok) {
-      mostrar_mensagem_admin(
-        "✅ Novo administrador criado com sucesso!",
-        "success",
-        6000
-      );
+      mostrar_mensagem_admin("Admin criado com sucesso", "success");
       formulario.reset();
-
-      // Feedback adicional
-      setTimeout(() => {
-        mostrar_mensagem_admin(
-          "👑 O novo admin já pode fazer login no sistema.",
-          "info",
-          4000
-        );
-      }, 2000);
     } else {
       // Mensagens de erro específicas do servidor
-      let mensagem_erro = "❌ Erro ao criar administrador.";
+      let mensagem_erro = "Erro ao criar administrador";
 
       if (resultado.mensagem) {
         if (resultado.mensagem.includes("email")) {
-          mensagem_erro =
-            "📧 Este email já está cadastrado como administrador.";
+          mensagem_erro = "Este email já está cadastrado como administrador";
         } else if (resultado.mensagem.includes("Nome")) {
-          mensagem_erro = "👤 Erro no nome fornecido.";
+          mensagem_erro = "Erro no nome fornecido";
         } else if (resultado.mensagem.includes("Senha")) {
-          mensagem_erro = "🔒 Erro na senha fornecida.";
+          mensagem_erro = "Erro na senha fornecida";
         } else {
-          mensagem_erro = `❌ ${resultado.mensagem}`;
+          mensagem_erro = resultado.mensagem;
         }
       }
 
@@ -2138,7 +2002,7 @@ async function processar_cadastro_admin(formulario, dados_admin) {
   } catch (erro) {
     console.error("Erro ao criar admin:", erro);
     mostrar_mensagem_admin(
-      "🌐 Erro de conexão. Verifique sua internet e tente novamente.",
+      "Erro de conexão. Verifique sua internet e tente novamente",
       "error"
     );
   } finally {
@@ -2150,17 +2014,7 @@ async function processar_cadastro_admin(formulario, dados_admin) {
 function mostrar_mensagem_admin(texto, tipo = "info", duracao = 4000) {
   const div_mensagem = document.getElementById("admin-dashboard-message");
 
-  const icones = {
-    success: "✅",
-    error: "❌",
-    warning: "⚠️",
-    info: "ℹ️",
-  };
-
-  const icone = icones[tipo] || icones.info;
-  const textoComIcone = `${icone} ${texto}`;
-
-  div_mensagem.textContent = textoComIcone;
+  div_mensagem.textContent = texto;
   div_mensagem.className = `message ${tipo} show`;
 
   // Adiciona atributos de acessibilidade
