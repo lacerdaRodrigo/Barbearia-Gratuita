@@ -1895,19 +1895,25 @@ async function criar_novo_admin(evento) {
 
   // Validação do nome
   if (!dados_admin.nome) {
-    mostrar_mensagem_admin("Nome do administrador é obrigatório.", "error");
+    mostrar_mensagem_contexto("Nome do administrador é obrigatório.", "error");
     document.getElementById("novo-admin-nome").focus();
     return;
   }
 
   if (dados_admin.nome.length < 2) {
-    mostrar_mensagem_admin("Nome deve ter pelo menos 2 caracteres.", "error");
+    mostrar_mensagem_contexto(
+      "Nome deve ter pelo menos 2 caracteres.",
+      "error"
+    );
     document.getElementById("novo-admin-nome").focus();
     return;
   }
 
   if (dados_admin.nome.length > 50) {
-    mostrar_mensagem_admin("Nome deve ter no máximo 50 caracteres.", "error");
+    mostrar_mensagem_contexto(
+      "Nome deve ter no máximo 50 caracteres.",
+      "error"
+    );
     document.getElementById("novo-admin-nome").focus();
     return;
   }
@@ -1915,7 +1921,7 @@ async function criar_novo_admin(evento) {
   // Validação se nome contém apenas letras e espaços
   const nomeRegex = /^[a-zA-ZàáâãäéêëíìîïóôõöúùûüçñÀÁÂÃÄÉÊËÍÌÎÏÓÔÕÖÚÙÛÜÇÑ\s]+$/;
   if (!nomeRegex.test(dados_admin.nome)) {
-    mostrar_mensagem_admin(
+    mostrar_mensagem_contexto(
       "Nome deve conter apenas letras e espaços.",
       "error"
     );
@@ -1925,7 +1931,7 @@ async function criar_novo_admin(evento) {
 
   // Validação do email
   if (!dados_admin.email) {
-    mostrar_mensagem_admin("Email do administrador é obrigatório.", "error");
+    mostrar_mensagem_contexto("Email do administrador é obrigatório.", "error");
     document.getElementById("novo-admin-email").focus();
     return;
   }
@@ -1934,26 +1940,32 @@ async function criar_novo_admin(evento) {
   const emailRegex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   if (!emailRegex.test(dados_admin.email)) {
-    mostrar_mensagem_admin("Por favor, insira um email válido.", "error");
+    mostrar_mensagem_contexto("Por favor, insira um email válido.", "error");
     document.getElementById("novo-admin-email").focus();
     return;
   }
 
   // Validação da senha
   if (!dados_admin.senha) {
-    mostrar_mensagem_admin("Senha do administrador é obrigatória.", "error");
+    mostrar_mensagem_contexto("Senha do administrador é obrigatória.", "error");
     document.getElementById("novo-admin-senha").focus();
     return;
   }
 
   if (dados_admin.senha.length < 6) {
-    mostrar_mensagem_admin("Senha deve ter pelo menos 6 caracteres.", "error");
+    mostrar_mensagem_contexto(
+      "Senha deve ter pelo menos 6 caracteres.",
+      "error"
+    );
     document.getElementById("novo-admin-senha").focus();
     return;
   }
 
   if (dados_admin.senha.length > 128) {
-    mostrar_mensagem_admin("Senha deve ter no máximo 128 caracteres.", "error");
+    mostrar_mensagem_contexto(
+      "Senha deve ter no máximo 128 caracteres.",
+      "error"
+    );
     document.getElementById("novo-admin-senha").focus();
     return;
   }
@@ -1979,7 +1991,8 @@ async function processar_cadastro_admin(formulario, dados_admin) {
     const resultado = await resposta.json();
 
     if (resposta.ok) {
-      mostrar_mensagem_admin("Admin criado com sucesso", "success");
+      // Usar função de contexto para mostrar mensagem no local correto
+      mostrar_mensagem_contexto("Admin criado com sucesso", "success");
       formulario.reset();
     } else {
       // Mensagens de erro específicas do servidor
@@ -1997,16 +2010,32 @@ async function processar_cadastro_admin(formulario, dados_admin) {
         }
       }
 
-      mostrar_mensagem_admin(mensagem_erro, "error");
+      mostrar_mensagem_contexto(mensagem_erro, "error");
     }
   } catch (erro) {
     console.error("Erro ao criar admin:", erro);
-    mostrar_mensagem_admin(
+    mostrar_mensagem_contexto(
       "Erro de conexão. Verifique sua internet e tente novamente",
       "error"
     );
   } finally {
     definir_estado_carregando(botao_envio, false);
+  }
+}
+
+// Função auxiliar para mostrar mensagem na tela correta
+function mostrar_mensagem_contexto(texto, tipo) {
+  const adminDashboardMessage = document.getElementById(
+    "admin-dashboard-message"
+  );
+  const generalMessage = document.getElementById("message");
+
+  if (adminDashboardMessage && adminDashboardMessage.offsetParent !== null) {
+    // Dashboard admin está visível
+    mostrar_mensagem_admin(texto, tipo);
+  } else if (generalMessage) {
+    // Usar mensagem geral da tela inicial
+    mostrar_mensagem(texto, tipo);
   }
 }
 
