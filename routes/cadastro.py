@@ -33,22 +33,13 @@ def cadastro():
         telefone_usuario = dados_recebidos.get('telefone')
         senha_usuario = dados_recebidos.get('senha')
 
-        #validações dos campos
         if not nome_usuario:
             return jsonify({"mensagem": "Nome de usuário é obrigatório."}), 400
-        
-        if not senha_usuario:
-            return jsonify({"mensagem": "Senha é obrigatória."}), 400
-        
-        if not email_usuario and not telefone_usuario:
-            return jsonify({"mensagem": "Email e telefone são obrigatórios para dar sequência"}), 400
-        
-        if not email_usuario or "@" not in email_usuario:
-            return jsonify({"mensagem": "E-mail inválido ou campo vazio."}), 400
 
         if not email_usuario or not senha_usuario:
             return jsonify({"mensagem": "Email e senha são obrigatórios para dar sequência"}), 400
 
+        # Validar telefone
         if not telefone_usuario:
             return jsonify({"mensagem": "Telefone é obrigatório."}), 400
         
@@ -59,8 +50,6 @@ def cadastro():
             
         if len(telefone_limpo) < 10 or len(telefone_limpo) > 15:
             return jsonify({"mensagem": "Telefone deve ter entre 10 e 15 dígitos."}), 400
-        
-        
 
         # Verificar se email já existe
         usuarios_collection = mongo.db.usuarios
@@ -110,8 +99,6 @@ def lista_usuarios():
         print(f"Erro ao listar usuários: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor, ao listar usuarios cadastrados"}), 500
 
-
-
 @blueprint_cadastro.route('/cadastro/<id_usuario>', methods=['DELETE'])
 def deletar_usuario(id_usuario):
     try:
@@ -132,16 +119,15 @@ def deletar_usuario(id_usuario):
              
         print(f"Erro ao deletar usuário: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor ao deletar usuário."}), 500
-
-
-
+    
 @blueprint_cadastro.route('/cadastro/deletar_todos', methods=['DELETE'])
 def deletar_todos_usuarios():
     try:
         usuarios_collection = mongo.db.usuarios
-        usuarios_collection.delete_many({})
 
-        return jsonify({"mensagem": f"Todos os usuários deletados com sucesso"}), 200
+        resultado = usuarios_collection.delete_many({})
+
+        return jsonify({"mensagem": f"Todos os usuários deletados com sucesso. Total deletado: {resultado.deleted_count}"}), 200
     
     except Exception as erro:
         print(f"Erro ao deletar todos os usuários: {erro}")
