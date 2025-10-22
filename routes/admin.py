@@ -118,3 +118,16 @@ def listar_usuarios():
         if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
             return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
+
+@blueprint_admin.route('/admin/usuarios/delete', methods=['DELETE'])
+def delete_usuario:
+    try:
+        admins_collection = mongo.db.admins
+
+        resultado = admins_collection.delete_many({})
+        return jsonify({"mensagem": f"{resultado.deleted_count} usuários deletados."}), 200
+    except Exception as erro:
+        print(f"Erro ao deletar usuários: {erro}")
+        if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
+            return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
+        return jsonify({"mensagem": "Erro interno do servidor."}), 500
