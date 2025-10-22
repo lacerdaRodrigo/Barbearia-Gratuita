@@ -12,6 +12,7 @@ from routes.agendamento import blueprint_agendamento  # Importa o Blueprint de a
 from routes.admin import blueprint_admin  # Importa o Blueprint de admin
 from routes.servico import blueprint_servico  # Importa o Blueprint de serviços
 
+
 def criar_aplicacao():
     aplicacao = Flask(__name__)
 
