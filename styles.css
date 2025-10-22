@@ -1227,3 +1227,46 @@ body {
 .modal-content:focus-within {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(102, 126, 234, 0.3);
 }
+
+/* Indicador de Força da Senha */
+.senha-strength {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.strength-bar {
+  height: 4px;
+  background-color: #e9ecef;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.strength-text {
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* Validação Visual dos Inputs */
+.input-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
+}
+
+.input-group input.valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.input-group input.invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}

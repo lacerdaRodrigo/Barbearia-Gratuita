@@ -3,9 +3,9 @@ const URL_BASE_DA_API = window.location.origin;
 
 // Sistema de Modal de Confirmação Customizado
 function criar_modal_confirmacao() {
-  const modal = document.createElement('div');
-  modal.id = 'modal-confirmacao';
-  modal.className = 'modal-overlay';
+  const modal = document.createElement("div");
+  modal.id = "modal-confirmacao";
+  modal.className = "modal-overlay";
   modal.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
@@ -26,37 +26,37 @@ function criar_modal_confirmacao() {
 
 // Função para mostrar confirmação customizada
 function mostrar_confirmacao(titulo, mensagem, callback) {
-  let modal = document.getElementById('modal-confirmacao');
+  let modal = document.getElementById("modal-confirmacao");
   if (!modal) {
     modal = criar_modal_confirmacao();
   }
 
-  document.getElementById('modal-titulo').textContent = titulo;
-  document.getElementById('modal-mensagem').textContent = mensagem;
-  
-  modal.style.display = 'flex';
-  modal.classList.add('show');
+  document.getElementById("modal-titulo").textContent = titulo;
+  document.getElementById("modal-mensagem").textContent = mensagem;
 
-  const btnConfirmar = document.getElementById('modal-confirmar');
-  const btnCancelar = document.getElementById('modal-cancelar');
+  modal.style.display = "flex";
+  modal.classList.add("show");
+
+  const btnConfirmar = document.getElementById("modal-confirmar");
+  const btnCancelar = document.getElementById("modal-cancelar");
 
   // Remove listeners anteriores
   btnConfirmar.replaceWith(btnConfirmar.cloneNode(true));
   btnCancelar.replaceWith(btnCancelar.cloneNode(true));
 
   // Adiciona novos listeners
-  document.getElementById('modal-confirmar').addEventListener('click', () => {
+  document.getElementById("modal-confirmar").addEventListener("click", () => {
     fechar_modal_confirmacao();
     callback(true);
   });
 
-  document.getElementById('modal-cancelar').addEventListener('click', () => {
+  document.getElementById("modal-cancelar").addEventListener("click", () => {
     fechar_modal_confirmacao();
     callback(false);
   });
 
   // Fechar ao clicar fora
-  modal.addEventListener('click', (e) => {
+  modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       fechar_modal_confirmacao();
       callback(false);
@@ -66,22 +66,22 @@ function mostrar_confirmacao(titulo, mensagem, callback) {
 
 // Função para fechar modal de confirmação
 function fechar_modal_confirmacao() {
-  const modal = document.getElementById('modal-confirmacao');
+  const modal = document.getElementById("modal-confirmacao");
   if (modal) {
-    modal.classList.remove('show');
-    modal.style.display = 'none';
+    modal.classList.remove("show");
+    modal.style.display = "none";
   }
 }
 
 // Função para limpar dados sensíveis da memória
 function limpar_dados_sensíveis(obj) {
-  if (typeof obj === 'string') {
-    return obj.replace(/./g, '');
+  if (typeof obj === "string") {
+    return obj.replace(/./g, "");
   }
-  if (typeof obj === 'object' && obj !== null) {
-    Object.keys(obj).forEach(key => {
+  if (typeof obj === "object" && obj !== null) {
+    Object.keys(obj).forEach((key) => {
       if (obj[key]) {
-        obj[key] = '';
+        obj[key] = "";
         delete obj[key];
       }
     });
@@ -92,7 +92,7 @@ function limpar_dados_sensíveis(obj) {
 // Função para fazer requisições autenticadas
 async function requisicao_autenticada(url, opcoes = {}) {
   const token = obter_token_valido();
-  
+
   if (!token) {
     mostrar_mensagem("Sessão expirada. Faça login novamente.", "error");
     setTimeout(() => {
@@ -102,14 +102,14 @@ async function requisicao_autenticada(url, opcoes = {}) {
   }
 
   const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-    ...opcoes.headers
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+    ...opcoes.headers,
   };
 
   return fetch(url, {
     ...opcoes,
-    headers
+    headers,
   });
 }
 
@@ -129,12 +129,12 @@ function salvar_token_sessao(token) {
   };
   // Usa sessionStorage para que a sessão expire ao fechar o navegador
   sessionStorage.setItem(CHAVE_TOKEN_USUARIO, JSON.stringify(sessao));
-  
+
   // Limpa o token da variável local imediatamente após salvar
   token = null;
-  
+
   // Remove qualquer referência ao token da memória
-  if (typeof window.gc === 'function') {
+  if (typeof window.gc === "function") {
     setTimeout(() => window.gc(), 100);
   }
 }
@@ -165,7 +165,7 @@ function obter_token_valido() {
 // Função para decodificar dados do token (sem validação de assinatura no frontend)
 function obter_dados_token(token) {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const payload = JSON.parse(atob(token.split(".")[1]));
     return payload;
   } catch (erro) {
     console.error("Erro ao decodificar token:", erro);
@@ -383,85 +383,103 @@ document.addEventListener("DOMContentLoaded", function () {
 function configurar_validacao_customizada() {
   // Remove mensagens padrão do HTML5 e adiciona customizadas
   // Exclui formulários de login para evitar conflitos
-  document.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
-    
-    // Pula validação customizada para formulários de login
-    const isLoginForm = input.closest('#loginForm') || input.closest('#adminForm');
-    if (isLoginForm) return;
-    
-    // Remove validação padrão apenas para formulários não-login
-    input.addEventListener('invalid', (evento) => {
-      evento.preventDefault();
-      
-      const campo = evento.target;
-      const nomeCampo = campo.previousElementSibling?.textContent || campo.name || 'Campo';
-      let mensagem = '';
+  document
+    .querySelectorAll("input[required], select[required], textarea[required]")
+    .forEach((input) => {
+      // Pula validação customizada para formulários de login
+      const isLoginForm =
+        input.closest("#loginForm") || input.closest("#adminForm");
+      if (isLoginForm) return;
 
-      if (campo.validity.valueMissing) {
-        mensagem = `${nomeCampo.replace(/[📧🔒👤📞🔑]/g, '').trim()} é obrigatório.`;
-      } else if (campo.validity.typeMismatch) {
-        if (campo.type === 'email') {
-          mensagem = `Por favor, insira um email válido.`;
-        }
-      } else if (campo.validity.tooShort) {
-        mensagem = `${nomeCampo.replace(/[📧🔒👤📞🔑]/g, '').trim()} deve ter pelo menos ${campo.minLength} caracteres.`;
-      } else if (campo.validity.patternMismatch) {
-        mensagem = `${nomeCampo.replace(/[📧🔒👤📞🔑]/g, '').trim()} tem formato inválido.`;
-      }
+      // Remove validação padrão apenas para formulários não-login
+      input.addEventListener("invalid", (evento) => {
+        evento.preventDefault();
 
-      if (mensagem) {
-        // Determina qual tipo de mensagem usar baseado no contexto
-        if (campo.closest('#dashboard')) {
-          mostrar_mensagem_dashboard(mensagem, 'error');
-        } else if (campo.closest('#admin-dashboard')) {
-          mostrar_mensagem_admin(mensagem, 'error');
-        } else {
-          mostrar_mensagem(mensagem, 'error');
+        const campo = evento.target;
+        const nomeCampo =
+          campo.previousElementSibling?.textContent || campo.name || "Campo";
+        let mensagem = "";
+
+        if (campo.validity.valueMissing) {
+          mensagem = `${nomeCampo
+            .replace(/[📧🔒👤📞🔑]/g, "")
+            .trim()} é obrigatório.`;
+        } else if (campo.validity.typeMismatch) {
+          if (campo.type === "email") {
+            mensagem = `Por favor, insira um email válido.`;
+          }
+        } else if (campo.validity.tooShort) {
+          mensagem = `${nomeCampo
+            .replace(/[📧🔒👤📞🔑]/g, "")
+            .trim()} deve ter pelo menos ${campo.minLength} caracteres.`;
+        } else if (campo.validity.patternMismatch) {
+          mensagem = `${nomeCampo
+            .replace(/[📧🔒👤📞🔑]/g, "")
+            .trim()} tem formato inválido.`;
         }
-        
-        // Foca no campo com erro
-        campo.focus();
+
+        if (mensagem) {
+          // Determina qual tipo de mensagem usar baseado no contexto
+          if (campo.closest("#dashboard")) {
+            mostrar_mensagem_dashboard(mensagem, "error");
+          } else if (campo.closest("#admin-dashboard")) {
+            mostrar_mensagem_admin(mensagem, "error");
+          } else {
+            mostrar_mensagem(mensagem, "error");
+          }
+
+          // Foca no campo com erro
+          campo.focus();
+        }
+      });
+
+      // Limpa mensagens quando campo fica válido
+      input.addEventListener("input", () => {
+        if (input.validity.valid) {
+          input.setCustomValidity("");
+        }
+      });
+
+      // Adiciona placeholder melhorado (exceto para login)
+      if (!isLoginForm) {
+        if (input.type === "email" && !input.placeholder) {
+          input.placeholder = "seu.email@exemplo.com";
+        } else if (input.type === "password" && !input.placeholder) {
+          input.placeholder = "Digite sua senha";
+        } else if (
+          input.type === "text" &&
+          input.name === "nome" &&
+          !input.placeholder
+        ) {
+          input.placeholder = "Digite seu nome completo";
+        } else if (input.type === "tel" && !input.placeholder) {
+          input.placeholder = "(11) 99999-9999";
+        }
       }
     });
 
-    // Limpa mensagens quando campo fica válido
-    input.addEventListener('input', () => {
-      if (input.validity.valid) {
-        input.setCustomValidity('');
-      }
-    });
+  // Intercepta submit de formulários para validação customizada (exceto login e admin)
+  document.querySelectorAll("form").forEach((form) => {
+    // Pula validação customizada para formulários de login e cadastro de admin
+    if (
+      form.id === "loginForm" ||
+      form.id === "adminForm" ||
+      form.id === "criar-admin-form"
+    )
+      return;
 
-    // Adiciona placeholder melhorado (exceto para login)
-    if (!isLoginForm) {
-      if (input.type === 'email' && !input.placeholder) {
-        input.placeholder = 'seu.email@exemplo.com';
-      } else if (input.type === 'password' && !input.placeholder) {
-        input.placeholder = 'Digite sua senha';
-      } else if (input.type === 'text' && input.name === 'nome' && !input.placeholder) {
-        input.placeholder = 'Digite seu nome completo';
-      } else if (input.type === 'tel' && !input.placeholder) {
-        input.placeholder = '(11) 99999-9999';
-      }
-    }
-  });
+    form.addEventListener("submit", (evento) => {
+      const camposInvalidos = form.querySelectorAll(":invalid");
 
-  // Intercepta submit de formulários para validação customizada (exceto login)
-  document.querySelectorAll('form').forEach(form => {
-    // Pula validação customizada para formulários de login
-    if (form.id === 'loginForm' || form.id === 'adminForm') return;
-    
-    form.addEventListener('submit', (evento) => {
-      const camposInvalidos = form.querySelectorAll(':invalid');
-      
       if (camposInvalidos.length > 0) {
         evento.preventDefault();
-        
+
         // Foca no primeiro campo inválido
         const primeiroCampo = camposInvalidos[0];
         primeiroCampo.focus();
-        
+
         // Dispara evento de validação customizada
-        primeiroCampo.dispatchEvent(new Event('invalid'));
+        primeiroCampo.dispatchEvent(new Event("invalid"));
       }
     });
   });
@@ -499,88 +517,148 @@ function configurar_formularios() {
   formulario_admin.addEventListener("submit", processar_login_admin);
 
   // Adiciona limpeza automática dos campos sensíveis quando perdem o foco
-  document.addEventListener('focusout', (evento) => {
-    if (evento.target.type === 'password') {
+  document.addEventListener("focusout", (evento) => {
+    if (evento.target.type === "password") {
       // Aguarda um pouco e limpa o campo de senha se não estiver em foco
       setTimeout(() => {
         if (document.activeElement !== evento.target) {
-          evento.target.setAttribute('autocomplete', 'off');
+          evento.target.setAttribute("autocomplete", "off");
         }
       }, 100);
     }
   });
 
   // Previne autocomplete em campos sensíveis
-  document.querySelectorAll('input[type="password"], input[type="email"]').forEach(input => {
-    input.setAttribute('autocomplete', 'off');
-    input.setAttribute('data-lpignore', 'true'); // Ignora LastPass
-    input.setAttribute('data-form-type', 'other'); // Previne preenchimento automático
-  });
+  document
+    .querySelectorAll('input[type="password"], input[type="email"]')
+    .forEach((input) => {
+      input.setAttribute("autocomplete", "off");
+      input.setAttribute("data-lpignore", "true"); // Ignora LastPass
+      input.setAttribute("data-form-type", "other"); // Previne preenchimento automático
+    });
 
-  // Formulário criar admin (na seção de configurações do admin)
+  // Formulário criar admin - agora usa a função validada criar_novo_admin
   const criarAdminForm = document.getElementById("criar-admin-form");
   if (criarAdminForm) {
-    criarAdminForm.addEventListener("submit", async (evt) => {
-      evt.preventDefault();
+    // Remove listener anterior se existir
+    criarAdminForm.removeEventListener("submit", criar_novo_admin);
+    // Adiciona o listener da função validada
+    criarAdminForm.addEventListener("submit", criar_novo_admin);
 
-      const nome = document.getElementById("novo-admin-nome").value.trim();
-      const email = document.getElementById("novo-admin-email").value.trim();
-      const senha = document.getElementById("novo-admin-senha").value;
+    // Melhora a experiência do usuário no formulário de admin
+    configurar_formulario_admin();
+  }
+}
 
-      const adminMsgEl = document.getElementById("admin-dashboard-message");
+// Configurar melhorias no formulário de cadastro de admin
+function configurar_formulario_admin() {
+  const nomeInput = document.getElementById("novo-admin-nome");
+  const emailInput = document.getElementById("novo-admin-email");
+  const senhaInput = document.getElementById("novo-admin-senha");
 
-      function showAdminMsg(text, type = "info") {
-        if (!adminMsgEl) return;
-        adminMsgEl.textContent = text;
-        adminMsgEl.className = `message ${type}`;
-      }
+  // Adiciona placeholders informativos
+  if (nomeInput) {
+    nomeInput.placeholder = "Nome completo do administrador";
+    nomeInput.setAttribute("maxlength", "50");
+  }
 
-      if (!nome || !email || !senha || senha.length < 6) {
-        showAdminMsg(
-          "Preencha todos os campos corretamente. Senha mínimo 6 caracteres.",
-          "error"
-        );
-        return;
-      }
+  if (emailInput) {
+    emailInput.placeholder = "admin@suabarbearia.com";
+    emailInput.setAttribute("maxlength", "100");
+  }
 
-      const submitBtn = criarAdminForm.querySelector('button[type="submit"]');
-      const prevText = submitBtn ? submitBtn.textContent : "Criar Admin";
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Enviando...";
-      }
+  if (senhaInput) {
+    senhaInput.placeholder = "Mínimo 8 caracteres (recomenda-se senha forte)";
+    senhaInput.setAttribute("maxlength", "128");
+    senhaInput.setAttribute("minlength", "8");
+  }
 
-      try {
-        const res = await fetch(`${URL_BASE_DA_API}/admin`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome, email, senha }),
-        });
+  // Indicador de força da senha em tempo real
+  if (senhaInput) {
+    senhaInput.addEventListener("input", (evento) => {
+      const senha = evento.target.value;
+      const indicador =
+        document.getElementById("senha-strength") || criarIndicadorSenha();
 
-        const payload = await res.json().catch(() => ({}));
+      const forca = calcularForcaSenha(senha);
+      atualizarIndicadorSenha(indicador, forca);
+    });
+  }
 
-        if (res.status === 201) {
-          showAdminMsg(
-            payload.mensagem || "Administrador criado com sucesso!",
-            "success"
-          );
-          criarAdminForm.reset();
-        } else if (res.status === 409) {
-          showAdminMsg(payload.mensagem || "Email já cadastrado.", "error");
+  // Validação de email em tempo real
+  if (emailInput) {
+    emailInput.addEventListener("blur", (evento) => {
+      const email = evento.target.value.trim();
+      if (email) {
+        const emailRegex =
+          /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if (!emailRegex.test(email)) {
+          evento.target.style.borderColor = "#dc3545";
+          evento.target.style.boxShadow =
+            "0 0 0 0.2rem rgba(220, 53, 69, 0.25)";
         } else {
-          showAdminMsg(payload.mensagem || `Erro: ${res.status}`, "error");
-        }
-      } catch (err) {
-        console.error("Erro ao criar admin:", err);
-        showAdminMsg("Erro de rede ao criar admin. Tente novamente.", "error");
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = prevText;
+          evento.target.style.borderColor = "#28a745";
+          evento.target.style.boxShadow =
+            "0 0 0 0.2rem rgba(40, 167, 69, 0.25)";
         }
       }
     });
   }
+}
+
+// Criar indicador visual de força da senha
+function criarIndicadorSenha() {
+  const senhaInput = document.getElementById("novo-admin-senha");
+  const indicador = document.createElement("div");
+  indicador.id = "senha-strength";
+  indicador.className = "senha-strength";
+  indicador.innerHTML = `
+    <div class="strength-bar">
+      <div class="strength-fill"></div>
+    </div>
+    <div class="strength-text">Digite uma senha</div>
+  `;
+
+  senhaInput.parentNode.appendChild(indicador);
+  return indicador;
+}
+
+// Calcular força da senha
+function calcularForcaSenha(senha) {
+  let pontos = 0;
+  let nivel = "fraca";
+  let cor = "#dc3545";
+  let texto = "Senha fraca";
+
+  if (senha.length >= 8) pontos += 1;
+  if (senha.length >= 12) pontos += 1;
+  if (/[a-z]/.test(senha)) pontos += 1;
+  if (/[A-Z]/.test(senha)) pontos += 1;
+  if (/[0-9]/.test(senha)) pontos += 1;
+  if (/[^A-Za-z0-9]/.test(senha)) pontos += 1;
+
+  if (pontos >= 5) {
+    nivel = "forte";
+    cor = "#28a745";
+    texto = "Senha forte ✅";
+  } else if (pontos >= 3) {
+    nivel = "media";
+    cor = "#ffc107";
+    texto = "Senha média ⚠️";
+  }
+
+  return { pontos, nivel, cor, texto, porcentagem: (pontos / 6) * 100 };
+}
+
+// Atualizar indicador visual de força da senha
+function atualizarIndicadorSenha(indicador, forca) {
+  const fill = indicador.querySelector(".strength-fill");
+  const text = indicador.querySelector(".strength-text");
+
+  fill.style.width = `${forca.porcentagem}%`;
+  fill.style.backgroundColor = forca.cor;
+  text.textContent = forca.texto;
+  text.style.color = forca.cor;
 }
 
 // Configuração do logout
@@ -620,16 +698,18 @@ function fazer_logout() {
   limpar_formularios();
 
   // Força limpeza de todos os campos de entrada
-  document.querySelectorAll('input[type="email"], input[type="password"]').forEach(input => {
-    input.value = "";
-    input.setAttribute('autocomplete', 'off');
-  });
+  document
+    .querySelectorAll('input[type="email"], input[type="password"]')
+    .forEach((input) => {
+      input.value = "";
+      input.setAttribute("autocomplete", "off");
+    });
 
   // Volta para aba de login
   trocar_aba("login");
 
   // Força garbage collection se disponível
-  if (typeof window.gc === 'function') {
+  if (typeof window.gc === "function") {
     setTimeout(() => window.gc(), 500);
   }
 
@@ -651,8 +731,11 @@ async function processar_login(evento) {
 
   // Validação básica - apenas verifica se estão preenchidos
   if (!email || !senha) {
-    mostrar_mensagem("📧 Por favor, preencha email e senha para continuar.", "error");
-    
+    mostrar_mensagem(
+      "📧 Por favor, preencha email e senha para continuar.",
+      "error"
+    );
+
     // Foca no primeiro campo vazio
     if (!email) {
       document.getElementById("login-email").focus();
@@ -675,7 +758,7 @@ async function processar_login(evento) {
 
   // Limpa o formulário imediatamente para segurança (após capturar os dados)
   formulario_de_login.reset();
-  
+
   // Limpa os campos do DOM também
   document.getElementById("login-email").value = "";
   document.getElementById("login-senha").value = "";
@@ -683,7 +766,7 @@ async function processar_login(evento) {
   try {
     // Cria payload temporário e envia imediatamente
     const payload_temporario = { email, senha };
-    
+
     const resposta = await fetch(`${URL_BASE_DA_API}/login`, {
       method: "POST",
       headers: {
@@ -694,7 +777,7 @@ async function processar_login(evento) {
 
     // Força limpeza imediata do payload e variáveis
     limpar_dados_sensíveis(payload_temporario);
-    
+
     const resultado = await resposta.json();
 
     if (resposta.ok && resultado.access_token) {
@@ -719,7 +802,7 @@ async function processar_login(evento) {
     );
   } finally {
     // Força limpeza adicional usando garbage collection
-    if (typeof window.gc === 'function') {
+    if (typeof window.gc === "function") {
       window.gc(); // Força garbage collection se disponível
     }
     definir_estado_carregando(botao_de_envio, false);
@@ -761,7 +844,10 @@ async function processar_cadastro(evento) {
   // Validação de email mais robusta
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(dados_de_cadastro.email)) {
-    mostrar_mensagem("📧 Por favor, insira um email válido (exemplo: seu.email@gmail.com).", "error");
+    mostrar_mensagem(
+      "📧 Por favor, insira um email válido (exemplo: seu.email@gmail.com).",
+      "error"
+    );
     document.getElementById("cadastro-email").focus();
     return;
   }
@@ -773,7 +859,10 @@ async function processar_cadastro(evento) {
   }
 
   // Validação de telefone mais flexível
-  const telefone_limpo = dados_de_cadastro.telefone.replace(/[\s\-\(\)\+]/g, "");
+  const telefone_limpo = dados_de_cadastro.telefone.replace(
+    /[\s\-\(\)\+]/g,
+    ""
+  );
   if (!/^\d{10,15}$/.test(telefone_limpo)) {
     mostrar_mensagem(
       "📞 Telefone inválido. Use formato: (11) 99999-9999 ou 11999999999",
@@ -802,7 +891,10 @@ async function processar_cadastro(evento) {
   }
 
   if (dados_de_cadastro.senha !== dados_de_cadastro.senha_confirmacao) {
-    mostrar_mensagem("🔑 As senhas não coincidem. Verifique novamente.", "error");
+    mostrar_mensagem(
+      "🔑 As senhas não coincidem. Verifique novamente.",
+      "error"
+    );
     document.getElementById("confirm-senha").focus();
     return;
   }
@@ -834,22 +926,26 @@ async function processar_cadastro(evento) {
       setTimeout(() => {
         trocar_aba("login");
         limpar_formularios();
-        mostrar_mensagem("👋 Agora você pode fazer login com suas credenciais!", "info");
+        mostrar_mensagem(
+          "👋 Agora você pode fazer login com suas credenciais!",
+          "info"
+        );
       }, 2000);
     } else {
       // Mensagens de erro específicas do servidor
       let mensagem_erro = "❌ Erro no cadastro. Tente novamente.";
-      
+
       if (resultado.mensagem) {
         if (resultado.mensagem.includes("email")) {
-          mensagem_erro = "📧 Este email já está cadastrado. Tente fazer login ou use outro email.";
+          mensagem_erro =
+            "📧 Este email já está cadastrado. Tente fazer login ou use outro email.";
         } else if (resultado.mensagem.includes("telefone")) {
           mensagem_erro = "📞 Este telefone já está cadastrado.";
         } else {
           mensagem_erro = `❌ ${resultado.mensagem}`;
         }
       }
-      
+
       mostrar_mensagem(mensagem_erro, "error");
     }
   } catch (erro) {
@@ -922,9 +1018,9 @@ function mostrar_mensagem(texto, tipo = "info", duracao = 5000) {
   // Adiciona ícones baseados no tipo
   const icones = {
     success: "✅",
-    error: "❌", 
+    error: "❌",
     warning: "⚠️",
-    info: "ℹ️"
+    info: "ℹ️",
   };
 
   const icone = icones[tipo] || icones.info;
@@ -932,10 +1028,13 @@ function mostrar_mensagem(texto, tipo = "info", duracao = 5000) {
 
   div_da_mensagem.textContent = textoComIcone;
   div_da_mensagem.className = `message ${tipo} show`;
-  
+
   // Adiciona atributos de acessibilidade
-  div_da_mensagem.setAttribute('role', 'alert');
-  div_da_mensagem.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
+  div_da_mensagem.setAttribute("role", "alert");
+  div_da_mensagem.setAttribute(
+    "aria-live",
+    tipo === "error" ? "assertive" : "polite"
+  );
 
   // Auto-hide baseado na duração especificada
   setTimeout(() => {
@@ -981,7 +1080,7 @@ async function processar_login_admin(evento) {
     const form = new FormData(formulario_admin);
     return {
       e: form.get("email")?.trim() || "",
-      s: form.get("senha") || ""
+      s: form.get("senha") || "",
     };
   };
 
@@ -989,8 +1088,11 @@ async function processar_login_admin(evento) {
 
   // Validação básica - apenas verifica se estão preenchidos
   if (!email || !senha) {
-    mostrar_mensagem("👑 Por favor, preencha email e senha de administrador.", "error");
-    
+    mostrar_mensagem(
+      "👑 Por favor, preencha email e senha de administrador.",
+      "error"
+    );
+
     // Foca no primeiro campo vazio
     if (!email) {
       document.getElementById("admin-email").focus();
@@ -1017,7 +1119,7 @@ async function processar_login_admin(evento) {
   try {
     // Cria payload temporário
     const payload_admin = { email, senha };
-    
+
     const resposta = await fetch(`${URL_BASE_DA_API}/admin/login`, {
       method: "POST",
       headers: {
@@ -1035,13 +1137,17 @@ async function processar_login_admin(evento) {
       // Salva a sessão do admin
       salvar_sessao_admin(resultado.admin);
 
-      mostrar_mensagem("✅ Login de admin realizado com sucesso! 👑", "success");
+      mostrar_mensagem(
+        "✅ Login de admin realizado com sucesso! 👑",
+        "success"
+      );
       setTimeout(() => {
         mostrar_painel_admin(resultado.admin);
       }, 1000);
     } else {
       mostrar_mensagem(
-        resultado.mensagem || "❌ Credenciais de admin inválidas. Tente novamente.",
+        resultado.mensagem ||
+          "❌ Credenciais de admin inválidas. Tente novamente.",
         "error"
       );
     }
@@ -1053,7 +1159,7 @@ async function processar_login_admin(evento) {
     );
   } finally {
     // Força limpeza adicional
-    if (typeof window.gc === 'function') {
+    if (typeof window.gc === "function") {
       window.gc();
     }
     definir_estado_carregando(botao_de_envio, false);
@@ -1172,13 +1278,17 @@ async function processar_agendamento() {
   // Obter dados do usuário do token
   const token = obter_token_valido();
   if (!token) {
-    mostrar_mensagem_dashboard("Sessão expirada. Faça login novamente.", "error");
+    mostrar_mensagem_dashboard(
+      "Sessão expirada. Faça login novamente.",
+      "error"
+    );
     return;
   }
 
   const dados_usuario = obter_dados_token(token);
   const dados_agendamento = {
-    nome_do_cliente: dados_usuario?.nome || dados_formulario.get("nome_do_cliente"),
+    nome_do_cliente:
+      dados_usuario?.nome || dados_formulario.get("nome_do_cliente"),
     tipo_de_servico: dados_formulario.get("tipo_de_servico"),
     data_e_hora: `${dados_formulario.get("data")} ${dados_formulario.get(
       "hora"
@@ -1205,10 +1315,13 @@ async function processar_agendamento() {
   definir_estado_carregando(botao_envio, true);
 
   try {
-    const resposta = await requisicao_autenticada(`${URL_BASE_DA_API}/agendamento`, {
-      method: "POST",
-      body: JSON.stringify(dados_agendamento),
-    });
+    const resposta = await requisicao_autenticada(
+      `${URL_BASE_DA_API}/agendamento`,
+      {
+        method: "POST",
+        body: JSON.stringify(dados_agendamento),
+      }
+    );
 
     if (!resposta) return; // Erro de autenticação já tratado
 
@@ -1222,7 +1335,8 @@ async function processar_agendamento() {
       formulario.reset();
 
       // Preenche novamente o nome do cliente
-      document.getElementById("cliente-nome").value = dados_agendamento.nome_do_cliente;
+      document.getElementById("cliente-nome").value =
+        dados_agendamento.nome_do_cliente;
 
       // Limpa o select de horários para forçar nova seleção de data
       document.getElementById("hora-agendamento").innerHTML =
@@ -1242,7 +1356,9 @@ async function processar_agendamento() {
       }
 
       mostrar_mensagem_dashboard(
-        resultado.message || resultado.mensagem || "Erro ao criar agendamento. Tente novamente.",
+        resultado.message ||
+          resultado.mensagem ||
+          "Erro ao criar agendamento. Tente novamente.",
         "error"
       );
     }
@@ -1266,9 +1382,12 @@ async function carregar_agendamentos() {
     '<div class="loading">Carregando agendamentos...</div>';
 
   try {
-    const resposta = await requisicao_autenticada(`${URL_BASE_DA_API}/agendamento`, {
-      method: "GET",
-    });
+    const resposta = await requisicao_autenticada(
+      `${URL_BASE_DA_API}/agendamento`,
+      {
+        method: "GET",
+      }
+    );
 
     if (!resposta) return; // Erro de autenticação já tratado
 
@@ -1363,9 +1482,9 @@ function mostrar_mensagem_dashboard(texto, tipo = "info", duracao = 4000) {
 
   const icones = {
     success: "✅",
-    error: "❌", 
+    error: "❌",
     warning: "⚠️",
-    info: "ℹ️"
+    info: "ℹ️",
   };
 
   const icone = icones[tipo] || icones.info;
@@ -1373,10 +1492,13 @@ function mostrar_mensagem_dashboard(texto, tipo = "info", duracao = 4000) {
 
   div_mensagem.textContent = textoComIcone;
   div_mensagem.className = `message ${tipo} show`;
-  
+
   // Adiciona atributos de acessibilidade
-  div_mensagem.setAttribute('role', 'alert');
-  div_mensagem.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
+  div_mensagem.setAttribute("role", "alert");
+  div_mensagem.setAttribute(
+    "aria-live",
+    tipo === "error" ? "assertive" : "polite"
+  );
 
   // Auto-hide após duração especificada
   setTimeout(() => {
@@ -1426,7 +1548,9 @@ async function cancelar_agendamento(id_agendamento) {
           }, 1000);
         } else {
           mostrar_mensagem_dashboard(
-            resultado.message || resultado.mensagem || "Erro ao cancelar agendamento.",
+            resultado.message ||
+              resultado.mensagem ||
+              "Erro ao cancelar agendamento.",
             "error"
           );
         }
@@ -1829,11 +1953,139 @@ async function criar_novo_admin(evento) {
   const dados_formulario = new FormData(formulario);
 
   const dados_admin = {
-    nome: dados_formulario.get("nome"),
-    email: dados_formulario.get("email"),
+    nome: dados_formulario.get("nome")?.trim(),
+    email: dados_formulario.get("email")?.trim().toLowerCase(),
     senha: dados_formulario.get("senha"),
   };
 
+  // === VALIDAÇÕES DETALHADAS ===
+
+  // Validação do nome
+  if (!dados_admin.nome) {
+    mostrar_mensagem_admin("👤 Nome do administrador é obrigatório.", "error");
+    document.getElementById("novo-admin-nome").focus();
+    return;
+  }
+
+  if (dados_admin.nome.length < 2) {
+    mostrar_mensagem_admin(
+      "👤 Nome deve ter pelo menos 2 caracteres.",
+      "error"
+    );
+    document.getElementById("novo-admin-nome").focus();
+    return;
+  }
+
+  if (dados_admin.nome.length > 50) {
+    mostrar_mensagem_admin(
+      "👤 Nome deve ter no máximo 50 caracteres.",
+      "error"
+    );
+    document.getElementById("novo-admin-nome").focus();
+    return;
+  }
+
+  // Validação se nome contém apenas letras e espaços
+  const nomeRegex = /^[a-zA-ZàáâãäéêëíìîïóôõöúùûüçñÀÁÂÃÄÉÊËÍÌÎÏÓÔÕÖÚÙÛÜÇÑ\s]+$/;
+  if (!nomeRegex.test(dados_admin.nome)) {
+    mostrar_mensagem_admin(
+      "👤 Nome deve conter apenas letras e espaços.",
+      "error"
+    );
+    document.getElementById("novo-admin-nome").focus();
+    return;
+  }
+
+  // Validação do email
+  if (!dados_admin.email) {
+    mostrar_mensagem_admin("📧 Email do administrador é obrigatório.", "error");
+    document.getElementById("novo-admin-email").focus();
+    return;
+  }
+
+  // Validação de formato de email mais robusta
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  if (!emailRegex.test(dados_admin.email)) {
+    mostrar_mensagem_admin(
+      "📧 Por favor, insira um email válido (exemplo: admin@barbearia.com).",
+      "error"
+    );
+    document.getElementById("novo-admin-email").focus();
+    return;
+  }
+
+  // Validação se é um email empresarial (opcional, mas recomendado para admin)
+  const dominiosPublicos = [
+    "gmail.com",
+    "yahoo.com",
+    "hotmail.com",
+    "outlook.com",
+    "live.com",
+  ];
+  const dominio = dados_admin.email.split("@")[1];
+  if (dominiosPublicos.includes(dominio)) {
+    mostrar_confirmacao(
+      "⚠️ Email Público Detectado",
+      `Você está usando um email público (${dominio}). Para segurança, recomenda-se usar um email empresarial. Deseja continuar mesmo assim?`,
+      async (confirmado) => {
+        if (confirmado) {
+          await processar_cadastro_admin(formulario, dados_admin);
+        }
+      }
+    );
+    return;
+  }
+
+  // Validação da senha
+  if (!dados_admin.senha) {
+    mostrar_mensagem_admin("🔒 Senha do administrador é obrigatória.", "error");
+    document.getElementById("novo-admin-senha").focus();
+    return;
+  }
+
+  if (dados_admin.senha.length < 8) {
+    mostrar_mensagem_admin(
+      "🔒 Senha deve ter pelo menos 8 caracteres para maior segurança.",
+      "error"
+    );
+    document.getElementById("novo-admin-senha").focus();
+    return;
+  }
+
+  if (dados_admin.senha.length > 128) {
+    mostrar_mensagem_admin(
+      "🔒 Senha deve ter no máximo 128 caracteres.",
+      "error"
+    );
+    document.getElementById("novo-admin-senha").focus();
+    return;
+  }
+
+  // Validação de força da senha
+  const senhaForte =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+  if (!senhaForte.test(dados_admin.senha)) {
+    mostrar_confirmacao(
+      "🔐 Senha Fraca Detectada",
+      "Para maior segurança, recomenda-se uma senha com: letra minúscula, maiúscula, número e símbolo. Deseja continuar com esta senha?",
+      async (confirmado) => {
+        if (confirmado) {
+          await processar_cadastro_admin(formulario, dados_admin);
+        } else {
+          document.getElementById("novo-admin-senha").focus();
+        }
+      }
+    );
+    return;
+  }
+
+  // Se passou em todas as validações, processa o cadastro
+  await processar_cadastro_admin(formulario, dados_admin);
+}
+
+// Função separada para processar o cadastro de admin
+async function processar_cadastro_admin(formulario, dados_admin) {
   const botao_envio = formulario.querySelector(".btn");
   definir_estado_carregando(botao_envio, true);
 
@@ -1849,17 +2101,46 @@ async function criar_novo_admin(evento) {
     const resultado = await resposta.json();
 
     if (resposta.ok) {
-      mostrar_mensagem_admin("✅ Novo admin criado com sucesso!", "success");
-      formulario.reset();
-    } else {
       mostrar_mensagem_admin(
-        resultado.mensagem || "Erro ao criar admin.",
-        "error"
+        "✅ Novo administrador criado com sucesso!",
+        "success",
+        6000
       );
+      formulario.reset();
+
+      // Feedback adicional
+      setTimeout(() => {
+        mostrar_mensagem_admin(
+          "👑 O novo admin já pode fazer login no sistema.",
+          "info",
+          4000
+        );
+      }, 2000);
+    } else {
+      // Mensagens de erro específicas do servidor
+      let mensagem_erro = "❌ Erro ao criar administrador.";
+
+      if (resultado.mensagem) {
+        if (resultado.mensagem.includes("email")) {
+          mensagem_erro =
+            "📧 Este email já está cadastrado como administrador.";
+        } else if (resultado.mensagem.includes("Nome")) {
+          mensagem_erro = "👤 Erro no nome fornecido.";
+        } else if (resultado.mensagem.includes("Senha")) {
+          mensagem_erro = "🔒 Erro na senha fornecida.";
+        } else {
+          mensagem_erro = `❌ ${resultado.mensagem}`;
+        }
+      }
+
+      mostrar_mensagem_admin(mensagem_erro, "error");
     }
   } catch (erro) {
     console.error("Erro ao criar admin:", erro);
-    mostrar_mensagem_admin("Erro de conexão.", "error");
+    mostrar_mensagem_admin(
+      "🌐 Erro de conexão. Verifique sua internet e tente novamente.",
+      "error"
+    );
   } finally {
     definir_estado_carregando(botao_envio, false);
   }
@@ -1871,9 +2152,9 @@ function mostrar_mensagem_admin(texto, tipo = "info", duracao = 4000) {
 
   const icones = {
     success: "✅",
-    error: "❌", 
+    error: "❌",
     warning: "⚠️",
-    info: "ℹ️"
+    info: "ℹ️",
   };
 
   const icone = icones[tipo] || icones.info;
@@ -1881,10 +2162,13 @@ function mostrar_mensagem_admin(texto, tipo = "info", duracao = 4000) {
 
   div_mensagem.textContent = textoComIcone;
   div_mensagem.className = `message ${tipo} show`;
-  
+
   // Adiciona atributos de acessibilidade
-  div_mensagem.setAttribute('role', 'alert');
-  div_mensagem.setAttribute('aria-live', tipo === 'error' ? 'assertive' : 'polite');
+  div_mensagem.setAttribute("role", "alert");
+  div_mensagem.setAttribute(
+    "aria-live",
+    tipo === "error" ? "assertive" : "polite"
+  );
 
   setTimeout(() => {
     div_mensagem.classList.remove("show");
