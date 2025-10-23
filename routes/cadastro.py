@@ -93,14 +93,12 @@ def lista_usuarios():
         print(f"Erro ao listar usuários: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor, ao listar usuarios cadastrados"}), 500
 
-@blueprint_cadastro.route('/cadastro/<id_usuario>', methods=['DELETE'])
-def deletar_usuario(id_usuario):
+@blueprint_cadastro.route('/cadastro/<nome>', methods=['DELETE'])
+def deletar_usuario(nome):
     try:
-        id_objeto = ObjectId(id_usuario)
-
         usuarios_collection = mongo.db.usuarios
 
-        resultado = usuarios_collection.delete_one({"_id": id_objeto})
+        resultado = usuarios_collection.delete_one({"nome": nome})
 
         if resultado.deleted_count == 0:
             return jsonify({"mensagem": "Usuário não encontrado."}), 404
