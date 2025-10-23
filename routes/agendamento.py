@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from extensions import mongo
 from models.agendamento import Agendamento
 from bson import ObjectId  
+from pymongo.errors import DuplicateKeyError, ServerSelectionTimeoutError, AutoReconnect
 
 blueprint_agendamento = Blueprint('agendamento', __name__)
 
@@ -58,7 +59,6 @@ def criar_agendamento():
         print(f"Erro no agendamento: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
-
 @blueprint_agendamento.route('/agendamento', methods=['GET'])
 def listar_agendamentos():
     try:
@@ -75,9 +75,7 @@ def listar_agendamentos():
         
     except Exception as erro:
         print(f"Erro ao listar agendamentos: {erro}")
-        return jsonify({"mensagem": "Erro interno do servidor."}), 500 
-
-    
+        return jsonify({"mensagem": "Erro interno do servidor."}), 500  
    
 @blueprint_agendamento.route('/agendamento/<string:agendamento_id>', methods=['DELETE'])
 def cancelar_agendamento(agendamento_id):
@@ -102,6 +100,20 @@ def cancelar_agendamento(agendamento_id):
         print(f"Erro ao cancelar agendamento: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
+@blueprint_agendamento.route('/agendamento/delete', methods=['DELETE'])
+def deletar_todos_agendamentos():
+    try:
+        agendamento_deletar_collection = mongo.db.agendamentos
+
+        resultado = agendamento_deletar_collection.delete_many({})
+        return jsonify({"mensagem": "Todos agendamentos deletados com sucesso"}), 200
+    
+    except Exception as erro:
+        print(f"Erro ao deletar usuários: {erro}")
+
+        if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
+            return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
+        return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
 @blueprint_agendamento.route('/horarios-disponiveis', methods=['GET'])
 def horarios_disponiveis():
@@ -147,3 +159,4 @@ def horarios_disponiveis():
     except Exception as erro:
         print(f"Erro ao buscar horários disponíveis: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
+

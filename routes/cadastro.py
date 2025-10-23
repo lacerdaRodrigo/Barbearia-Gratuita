@@ -7,11 +7,6 @@ from bson.objectid import ObjectId
 
 blueprint_cadastro = Blueprint('cadastro', __name__)
 
-
-# -------------------------------------------------------------
-# 3. Rotas da API
-# -------------------------------------------------------------
-
 # Rota principal para servir o HTML
 @blueprint_cadastro.route('/')
 def pagina_inicial():
@@ -79,7 +74,6 @@ def cadastro():
     except Exception as erro:
         print(f"Erro no cadastro: {erro}") 
         return jsonify({"mensagem": "Erro interno do servidor. Verifique o console."}), 500
-
 
 @blueprint_cadastro.route('/cadastro', methods=['GET'])
 def lista_usuarios():

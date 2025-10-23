@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import mongo
 from models.admin import AdminBarbearia
 from pymongo.errors import DuplicateKeyError, ServerSelectionTimeoutError, AutoReconnect
+from models.admin import AdminBarbearia
 
 blueprint_admin = Blueprint('admin', __name__)
 
@@ -54,7 +55,6 @@ def criar_admin():
         print(f"Erro ao criar admin: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
-
 @blueprint_admin.route('/admin/login', methods=['POST'])
 def login_admin():
     try:
@@ -87,37 +87,23 @@ def login_admin():
             return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
-
 @blueprint_admin.route('/admin/usuarios', methods=['GET'])
 def listar_usuarios():
     try:
-        from models.user import Usuario
-        usuarios_collection = mongo.db.usuarios
-        usuarios_cursor = usuarios_collection.find({})
-        
-        usuarios_lista = []
-        for usuario_doc in usuarios_cursor:
-            usuario_dict = Usuario.to_dict(usuario_doc)
-            if usuario_dict:
-                # Remove campos sensíveis para o admin
-                del usuario_dict['id']  # Remove o id se necessário
-                usuarios_lista.append({
-                    "id": str(usuario_doc["_id"]),
-                    "nome": usuario_doc.get("nome"),
-                    "email": usuario_doc.get("email"),
-                    "telefone": usuario_doc.get("telefone")
-                })
-        
-        return jsonify({
-            "usuarios": usuarios_lista,
-            "total": len(usuarios_lista)
-        }), 200
+        admin_collection = mongo.db.admins
+        admin_cursor = admin_collection.find({})
 
+        admin_lista = []
+        for admin_doc in admin_cursor:
+            admin_dict = AdminBarbearia.to_dict(admin_doc)
+            if admin_dict:
+                admin_lista.append(admin_dict)
+
+        return jsonify(admin_lista), 200
+    
     except Exception as erro:
         print(f"Erro ao listar usuários: {erro}")
-        if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
-            return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
-        return jsonify({"mensagem": "Erro interno do servidor."}), 500
+        return jsonify({"mensagem": "Erro interno do servidor, ao listar usuarios cadastrados"}), 500
 
 @blueprint_admin.route('/admin/usuarios/delete', methods=['DELETE'])
 def delete_admin():
@@ -126,8 +112,28 @@ def delete_admin():
 
         resultado = admins_collection.delete_many({})
         return jsonify({"mensagem": f"{resultado.deleted_count} usuários deletados."}), 200
+    
     except Exception as erro:
         print(f"Erro ao deletar usuários: {erro}")
         if isinstance(erro, (ServerSelectionTimeoutError, AutoReconnect)):
             return jsonify({"mensagem": "Serviço de banco de dados indisponível. Tente novamente mais tarde."}), 503
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
+
+@blueprint_admin.route('/admin/usuarios/<nome>', methods=['DELETE'])
+def deletar_admin_nome(nome):
+    try:
+        nome_collection = mongo.db.admins
+
+        resultado = nome_collection.delete_one({"nome": nome})
+
+        if resultado.deleted_count == 0:
+            return jsonify({"mensagem": "Usuario não encotrado"}), 404
+        
+        return jsonify({"mensagem": "usuario deletado com sucesso"}), 200
+    
+    except Exception as erro:
+        if "Invalid ObjectId" in str(erro):
+             return jsonify({"mensagem": "ID de usuário inválido."}), 400
+             
+        print(f"Erro ao deletar usuário: {erro}")
+        return jsonify({"mensagem": "Erro interno do servidor ao deletar usuário."}), 500

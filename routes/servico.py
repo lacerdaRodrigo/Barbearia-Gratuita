@@ -28,7 +28,6 @@ def listar_servicos():
         print(f"Erro ao listar serviços: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
-
 @blueprint_servico.route('/admin/servicos', methods=['POST'])
 def criar_servico():
     try:
@@ -80,7 +79,6 @@ def criar_servico():
     except Exception as erro:
         print(f"Erro ao criar serviço: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
-
 
 @blueprint_servico.route('/admin/servicos/<string:servico_id>', methods=['PUT'])
 def atualizar_servico(servico_id):
@@ -154,7 +152,6 @@ def atualizar_servico(servico_id):
         print(f"Erro ao atualizar serviço: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
 
-
 @blueprint_servico.route('/admin/servicos/<string:servico_id>', methods=['DELETE'])
 def deletar_servico(servico_id):
     try:
@@ -175,7 +172,6 @@ def deletar_servico(servico_id):
     except Exception as erro:
         print(f"Erro ao deletar serviço: {erro}")
         return jsonify({"mensagem": "Erro interno do servidor."}), 500
-
 
 @blueprint_servico.route('/servicos', methods=['GET'])
 def listar_servicos_publicos():
