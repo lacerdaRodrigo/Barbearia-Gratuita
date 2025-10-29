@@ -1,261 +1,293 @@
 # 🪒 Sistema de Barbearia
 
-Sistema web para gerenciamento de barbearia com funcionalidades de cadastro, login, agendamento de horários e painel administrativo.
+Sistema completo para gerenciamento de barbearia com backend em Flask, frontend web e API RESTful integrada.
 
-## 📋 Pré-requisitos
+**🌐 Demo Online:** https://barbearia-gratuita.onrender.com  
+**📡 Documentação da API:** [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 
-Antes de executar o projeto, certifique-se de ter os seguintes softwares instalados:
+---
 
-### 1. Python 3.7 ou superior
+## 🚀 Funcionalidades
 
-- **Download:** [https://www.python.org/downloads/](https://www.python.org/downloads/)
-- **Versão recomendada:** Python 3.9 ou superior
-- **Como verificar:**
-  ```bash
-  python --version
-  ```
+### Para Clientes:
+- ✅ **Cadastro de usuários** com validação
+- 🔐 **Login seguro** com autenticação JWT
+- 📅 **Agendamento de horários** em tempo real
+- ⏰ **Consulta de horários disponíveis**
+- 📱 **Interface responsiva** e moderna
 
-### 2. MongoDB 6.0 ou superior
+### Para Administradores:
+- 👨‍💼 **Painel administrativo** completo
+- 🛠️ **Gerenciamento de serviços** (CRUD)
+- 📊 **Visualização de agendamentos**
+- 👥 **Controle de usuários**
+- 💰 **Definição de preços** e emojis
 
-- **Download:** [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-- **Docker (alternativa):**
-  ```bash
-  docker run -d -p 27017:27017 --name mongo mongo:6.0
-  ```
+### Técnicas:
+- 🔒 **Senhas criptografadas** (Werkzeug)
+- 🌐 **CORS habilitado** para frontend
+- 📡 **API RESTful** completa
+- 🗄️ **MongoDB** para persistência
+- 🚀 **Deploy pronto** (Heroku/Render)
 
-### 3. pip (Gerenciador de pacotes do Python)
+---
 
-- Geralmente já vem instalado com o Python
-- **Como verificar:**
-  ```bash
-  pip --version
-  ```
+## 🔧 Tecnologias Utilizadas
 
-### 4. Git (Opcional, para clonar o repositório)
+### Backend:
+- **Python 3.x**
+- **Flask 3.0.3** - Framework web principal
+- **MongoDB** - Banco de dados NoSQL
+- **PyMongo 4.15.3** - Driver MongoDB
+- **JWT (PyJWT)** - Autenticação por tokens
+- **Werkzeug 3.0.3** - Segurança e utilitários
+- **Flask-CORS 4.0.1** - Suporte CORS
+- **Gunicorn 21.2.0** - Servidor de produção
 
-- **Download:** [https://git-scm.com/downloads](https://git-scm.com/downloads)
+### Frontend:
+- **HTML5** - Estrutura
+- **CSS3** - Estilização responsiva
+- **JavaScript ES6** - Interatividade
+- **Fetch API** - Comunicação com backend
 
-## 🚀 Instalação e Configuração
+---
 
-### 1. Clone ou baixe o projeto
+## 📦 Instalação e Desenvolvimento Local
 
+### Pré-requisitos:
+- **Python 3.7+** ([Download](https://www.python.org/downloads/))
+- **MongoDB** ([Download](https://www.mongodb.com/try/download/community) ou use Docker)
+- **Git** (opcional)
+
+### 1. Clone o projeto:
 ```bash
 git clone https://github.com/lacerdaRodrigo/Barbearia-Gratuita.git
 cd Barbearia-Gratuita
 ```
 
-### 2. Instale as dependências Python
-
+### 2. Instale as dependências:
 ```bash
 pip install -r requirements.txt
 ```
 
-**Principais dependências:**
+### 3. Configure o MongoDB:
 
-- **Flask** - Framework web para Python
-- **Flask-CORS** - Para permitir requisições do frontend
-- **PyMongo** - Driver MongoDB para Python
-- **Flask-PyMongo** - Integração MongoDB com Flask
-- **Werkzeug** - Para hash de senhas
-- **Gunicorn** - Servidor WSGI para produção
-
-### 3. Estrutura do projeto
-
-```
-Barbearia-Gratuita/
-│
-├── app.py                 # Arquivo principal da aplicação
-├── extensions.py         # Configurações do MongoDB
-├── requirements.txt      # Dependências do projeto
-├── index.html           # Interface do usuário
-├── script.js            # JavaScript do frontend
-├── styles.css           # Estilos CSS
-├── Procfile             # Configuração para deploy
-│
-├── models/              # Modelos de dados
-│   ├── admin.py         # Modelo de administrador
-│   ├── agendamento.py   # Modelo de agendamento
-│   ├── servico.py      # Modelo de serviço
-│   └── user.py         # Modelo de usuário
-│
-└── routes/              # Rotas da API
-    ├── admin.py         # Rotas administrativas
-    ├── agendamento.py  # Rotas de agendamento
-    ├── cadastro.py     # Rotas de cadastro
-    ├── login.py        # Rotas de autenticação
-    └── servico.py      # Rotas de serviços
-```
-
-## ▶️ Como executar o projeto
-
-### 1. Inicie o MongoDB
-
-Se estiver usando MongoDB local:
-
+**Opção A - MongoDB Local:**
 ```bash
-# Verifique se o serviço está rodando
+# Inicie o serviço MongoDB
 mongod
 ```
 
-Se estiver usando Docker:
-
+**Opção B - MongoDB via Docker:**
 ```bash
 docker run -d -p 27017:27017 --name mongo mongo:6.0
 ```
 
-### 2. Execute a aplicação
+### 4. Configure variáveis de ambiente (opcional):
+```bash
+# MongoDB (padrão: mongodb://localhost:27017/barbearia)
+export MONGO_URI="mongodb://localhost:27017/barbearia"
 
-No terminal, dentro da pasta do projeto:
+# JWT Secret (recomendado para produção)
+export JWT_SECRET_KEY="sua_chave_jwt_super_secreta"
 
+# Configurações do servidor
+export PORT=5000
+export DEBUG=True
+```
+
+### 5. Execute a aplicação:
 ```bash
 python app.py
 ```
 
-### 3. Acesse no navegador
+**🎉 Pronto!** Acesse: http://localhost:5000
+
+---
+
+## 📁 Estrutura do Projeto
 
 ```
-http://localhost:5000
+Barbearia-Gratuita/
+│
+├── app.py                 # 🚀 Aplicação principal
+├── extensions.py          # 🔧 Configurações MongoDB
+├── requirements.txt       # 📦 Dependências Python
+├── Procfile              # 🌐 Deploy Heroku/Render
+│
+├── index.html            # 🌟 Interface do usuário
+├── script.js             # ⚡ JavaScript frontend
+├── styles.css            # 🎨 Estilos CSS
+│
+├── models/               # 📊 Modelos de dados
+│   ├── admin.py          # 👨‍💼 Modelo administrador
+│   ├── agendamento.py    # 📅 Modelo agendamento
+│   ├── servico.py        # 🛠️ Modelo serviço
+│   └── user.py           # 👤 Modelo usuário
+│
+├── routes/               # 🛣️ Rotas da API
+│   ├── admin.py          # 👨‍💼 Rotas administrativas
+│   ├── agendamento.py    # 📅 Rotas agendamentos
+│   ├── cadastro.py       # 👤 Rotas usuários
+│   ├── login.py          # 🔐 Rotas autenticação
+│   └── servico.py        # 🛠️ Rotas serviços
+│
+└── tests/                # 🧪 Testes (Cypress)
+    └── cypress/
 ```
 
-## 🛠️ Funcionalidades
+---
 
-- ✅ **Cadastro de usuários** - Registro com nome, email, telefone e senha
-- ✅ **Login seguro** - Autenticação com hash de senha
-- ✅ **Painel administrativo** - Gerenciamento de serviços e horários
-- ✅ **Sistema de agendamentos** - Marcação de horários pelos clientes
-- ✅ **Gestão de serviços** - Cadastro e edição de serviços oferecidos
-- ✅ **Interface responsiva** - Design moderno e funcional
-- ✅ **Banco MongoDB** - Armazenamento escalável e flexível
-- ✅ **Validações** - Verificação de dados de entrada
+## 🎯 Como Usar o Sistema
 
-## � Como usar
+### 👤 **Para Usuários:**
 
-### Usuários comuns:
-
-1. **Cadastro:**
-
-   - Acesse a aba "Cadastro"
-   - Preencha seus dados
+1. **Acesse a aplicação** em http://localhost:5000
+2. **Cadastre-se:**
+   - Vá para aba "Cadastro"
+   - Preencha: nome, email, telefone, senha
    - Clique em "Cadastrar"
 
-2. **Login:**
-
+3. **Faça Login:**
+   - Vá para aba "Login"
    - Use seu email e senha
    - Clique em "Entrar"
 
-3. **Agendamentos:**
+4. **Agende um horário:**
    - Escolha o serviço desejado
    - Selecione data e horário
    - Confirme o agendamento
 
-### Administradores:
+### 👨‍💼 **Para Administradores:**
 
-1. **Acesso administrativo:**
+1. **Crie conta de admin:**
+   - Vá para aba "Admin"
+   - Cadastre-se como administrador
 
-   - Acesse a aba "Admin"
-   - Faça login com credenciais de administrador
+2. **Faça login administrativo:**
+   - Use suas credenciais de admin
+   - Acesse o painel de controle
 
-2. **Gerenciamento:**
+3. **Gerencie o sistema:**
    - Cadastre novos serviços
-   - Gerencie horários disponíveis
+   - Defina preços e emojis
    - Visualize agendamentos
-   - Cadastre outros administradores
-
-## 🌐 API Endpoints
-
-### Autenticação
-
-- `POST /login` - Login de usuário
-- `POST /admin/login` - Login de administrador
-
-### Usuários
-
-- `POST /cadastro` - Criar novo usuário
-- `GET /user/<id>` - Buscar usuário por ID
-
-### Administração
-
-- `POST /admin` - Criar novo administrador
-- `GET /admin/<id>` - Buscar administrador por ID
-
-### Serviços
-
-- `GET /servicos` - Listar todos os serviços
-- `POST /servicos` - Criar novo serviço
-- `PUT /servicos/<id>` - Atualizar serviço
-- `DELETE /servicos/<id>` - Remover serviço
-
-### Agendamentos
-
-- `GET /agendamentos` - Listar agendamentos
-- `POST /agendamentos` - Criar agendamento
-- `DELETE /agendamentos/<id>` - Cancelar agendamento
-
-## 🔧 Solução de Problemas
-
-### Erro de conexão com MongoDB
-
-- Verifique se o MongoDB está rodando
-- Confirme a porta 27017 está livre
-- Verifique as credenciais de acesso
-
-### Erros de CORS
-
-- O Flask-CORS está configurado
-- Verifique se está acessando pela URL correta
-
-### Página não carrega
-
-- Verifique os logs no terminal
-- Confirme que o MongoDB está acessível
-- Certifique-se que está na URL correta
-
-## 📝 Desenvolvimento
-
-### Stack Tecnológica
-
-- **Backend:**
-
-  - Flask (Python)
-  - MongoDB
-  - PyMongo
-  - Werkzeug
-
-- **Frontend:**
-  - HTML5
-  - CSS3
-  - JavaScript vanilla
-  - Fetch API
-
-### Adicionando Novas Funcionalidades
-
-1. **Modelos:** Adicione em `models/`
-2. **Rotas:** Crie em `routes/`
-3. **Frontend:** Modifique `index.html`, `script.js`, `styles.css`
-
-## 🤝 Contribuição
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-## 📞 Suporte
-
-Em caso de dúvidas ou problemas:
-
-- Abra uma issue no GitHub
-- Verifique os logs no terminal
-- Consulte a documentação:
-  - [Flask](https://flask.palletsprojects.com/)
-  - [PyMongo](https://pymongo.readthedocs.io/)
-  - [MongoDB](https://docs.mongodb.com/)
+   - Gerencie usuários
 
 ---
 
-**Desenvolvido por Rodrigo Lacerda**
+## 🗄️ Banco de Dados
+
+### Coleções criadas automaticamente:
+
+- **`usuarios`** - Dados dos clientes
+- **`agendamentos`** - Agendamentos realizados
+- **`servicos`** - Catálogo de serviços
+- **`admins`** - Administradores do sistema
+
+### Serviços padrão (criados automaticamente):
+- 💇‍♂️ Corte Masculino - R$ 25,00
+- 💇‍♀️ Corte Feminino - R$ 35,00
+- 🧔 Barba - R$ 20,00
+- ✨ Corte + Barba - R$ 40,00
+- 👨‍🦱 Bigode - R$ 15,00
+- 🌪️ Escova - R$ 30,00
+- 💧 Hidratação - R$ 45,00
+- 🔥 Corte + Barba + Bigode - R$ 50,00
+
+---
+
+## ⏰ Funcionamento da Barbearia
+
+**Horários de atendimento:**
+- 🌅 **Manhã:** 08:00 às 11:30 (intervalos de 30min)
+- 🌇 **Tarde:** 14:00 às 18:00 (intervalos de 30min)
+
+**Sistema de agendamento:**
+- ✅ Verificação automática de conflitos
+- ⏱️ Horários em tempo real
+- 📅 Agendamento por data específica
+
+---
+
+## 🌐 Deploy e Produção
+
+### Heroku:
+```bash
+# Criar app
+heroku create sua-barbearia
+
+# Configurar variáveis
+heroku config:set MONGO_URI="sua_mongodb_uri"
+heroku config:set JWT_SECRET_KEY="sua_chave_jwt"
+
+# Deploy
+git push heroku main
+```
+
+### Render (atual):
+1. Conecte seu repositório GitHub
+2. Configure as variáveis de ambiente
+3. Deploy automático a cada push
+
+### Docker:
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+```
+
+---
+
+## 🔒 Segurança
+
+- **🔐 Senhas:** Hash seguro com Werkzeug
+- **🎟️ Autenticação:** JWT com expiração de 24h
+- **🛡️ Validações:** Entrada de dados rigorosa
+- **🌐 CORS:** Configurado para frontend
+- **📝 Logs:** Sistema de logging para debug
+
+---
+
+## 🧪 Testes
+
+O projeto inclui testes automatizados com Cypress:
+
+```bash
+cd tests/cypress
+npm install
+npm run test
+```
+
+---
+
+## 🤝 Contribuição
+
+1. **Fork** o projeto
+2. **Crie** uma branch: `git checkout -b feature/MinhaFeature`
+3. **Commit** suas mudanças: `git commit -m 'Add: MinhaFeature'`
+4. **Push** para a branch: `git push origin feature/MinhaFeature`
+5. **Abra** um Pull Request
+
+---
+
+## 📞 Suporte e Documentação
+
+- **🐛 Issues:** Reporte problemas no GitHub
+- **📡 API:** Consulte [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
+- **📚 Docs Flask:** https://flask.palletsprojects.com/
+- **🗄️ MongoDB:** https://docs.mongodb.com/
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+**🚀 Sistema completo de barbearia - Do desenvolvimento ao deploy!**
